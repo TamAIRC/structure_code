@@ -1,0 +1,1 @@
+# Quy tắc code cơ bản cho dự án Python
