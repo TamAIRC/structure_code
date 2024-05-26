@@ -1,0 +1,1 @@
+# database/database_models/base_model.py

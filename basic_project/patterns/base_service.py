@@ -1,0 +1,1 @@
+# patterns/base_service.py
