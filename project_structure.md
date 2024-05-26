@@ -1,52 +1,103 @@
 # Cấu trúc dự án Python
 
 ```
-project_name/
+/project-root
 │
-├── README.md
-├── requirements.txt
-├── setup.py
-├── .gitignore
+├── /configs         # Thư mục chứa các file cấu hình
+│   ├── app_config.yaml
+│   ├── db_config.yaml
+│   └── logging_config.yaml
 │
-├── config/
-│   └── config.ini
+├── /database        # Thư mục chứa các script và model liên quan đến cơ sở dữ liệu
+│   ├── database_access # Thu muc chua cac lop thuc hien tuong tac database
+│   │   ├── 001_initial_setup.py
+│   │   ├── 002_add_user_table.py
+│   └── database_models # Cac model tuong duong voi tung bang databse
+│       ├── base_model.py
+│       ├── user_model.py
+│       └── product_model.py
 │
-├── dataset/
-│   └── (data files)
+├── /docs            # Thư mục chứa tài liệu dự án
+│   ├── oop.md
+│   ├── design_patterns.md
+│   └── database.md
 │
-├── models/
-│   └── (models files)
+├── /patterns        # thư muc chua base class/abtract class
 │
-├── log/
-│   └── (log files)
+├── /logger          # Thư mục chứa các module liên quan đến logging
+│   ├── logger.py
+│   └── log_formatter.py
 │
-├── docs/
-│   └── (documentation files)
+├── /scripts         # Thư mục chứa các tập lệnh tự động hóa
+│   ├── automation_script.py
+│   ├── performance_measurement.py
+│   └── project_management.py
 │
-├── src/
-│   ├── package_name/
-│   │   ├── __init__.py
-│   │   ├── module1.py
-│   │   ├── module2.py
-│   │   └── (other modules or subpackages)
-│   └── tests/
-│       ├── __init__.py
-│       ├── test_module1.py
-│       ├── test_module2.py
-│       └── (other test modules)
+├── /controllers     # Thư mục chứa các bộ điều khiển chung (logic điều hướng)
+│   ├── __init__.py
+│   ├── user_controller.py
+│   ├── product_controller.py
+│   └── order_controller.py│
 │
-├── examples/
-│   └── (example usage files)
+├── /models        # Thư mục chứa các business models có thể bao hàm nhiều db model
+│   ├── __init__.py
+│   └── user_model.py
 │
-├── docker/
-│   ├── Dockerfile
-│   └── (other Docker-related files)
+├── /services        # Thư mục chứa các dịch vụ chung
+│   ├── __init__.py
+│   ├── user_service.py
+│   ├── product_service.py
+│   └── order_service.py
 │
-├── scripts/
-│   └── (scripts files)
-|
-└── tools/
-    └── (other tools-related files)
+├── /utils           # Thư mục chứa các tiện ích và hàm dùng chung
+│   ├── __init__.py
+│   ├── file_utils.py
+│   ├── date_utils.py
+│   └── string_utils.py
+│
+├── /tests           # Thư mục chứa các bài kiểm thử (unit tests)
+│   ├── __init__.py
+│   ├── test_user.py
+│   ├── test_product.py
+│   └── test_order.py
+├── /modules             # Thư mục chứa mã nguồn chính của dịch vụ
+│   ├── __init__.py
+│   └── /module1
+│       ├── /controllers     # Thư mục chứa các bộ điều khiển của modules (logic điều hướng)
+│       │   ├── __init__.py
+│       │   ├── user_controller.py
+│       │   ├── product_controller.py
+│       │   └── order_controller.py
+│       │
+│       ├── /self_model        # Thư mục chứa các business model riêng của modules
+│       │   ├── __init__.py
+│       │   └── user_model.py
+│       │
+│       ├── /self_services        # Thư mục chứa các dịch vụ/support riêng của modules
+│       │   ├── __init__.py
+│       │   ├── user_service.py
+│       │   ├── product_service.py
+│       │   └── order_service.py
+│       │
+│       ├── /tests           # Thư mục chứa các bài kiểm thử (unit tests) module
+│       │   ├── __init__.py
+│       │   ├── test_user.py
+│       │   ├── test_product.py
+│       │   └── test_order.py
+│       │
+│       └── setup.py        # Tệp cấu hình setuptools cho việc cài đặt và phân phối module
+│
+├── /tests           # Thư mục chứa các bài kiểm thử (unit tests) hệ thống
+│   ├── __init__.py
+│   ├── test_user.py
+│   ├── test_product.py
+│   └── test_order.py
+│
+├── setup.py        # Tệp cấu hình setuptools cho việc cài đặt và phân phối dự án
+├── .gitignore       # File cấu hình git để bỏ qua các file/thư mục không cần track
+├── README.md        # File giới thiệu dự án
+└── requirements.txt # File liệt kê các package cần thiết (Python)
+
 ```
 
 ## Chú thích
@@ -63,37 +114,3 @@ project_name/
 
 - **config/**: Thư mục chứa các tệp cấu hình cho dự án.
 
-  - `config.ini`: Tệp cấu hình có thể sử dụng một định dạng cụ thể như INI, JSON, YAML, hoặc bất kỳ định dạng nào phù hợp với nhu cầu dự án.
-
-- **dataset/**: Thư mục để lưu trữ dữ liệu của dự án.
-
-- **models/**: Thư mục để lưu trữ các mô hình máy học hoặc học sâu (machine learning hoặc deep learning) được sử dụng trong dự án (kết quả huấn luyện mô hình).
-
-- **logs/**: Thư mục để lưu trữ các tệp nhật ký (logs) của ứng dụng.
-
-- **docs/**: Thư mục chứa tài liệu của dự án.
-
-- **src/**: Thư mục chứa mã nguồn của dự án.
-
-  - **package_name/**: Thư mục chứa các module Python của dự án.
-    - `__init__.py`: Tệp đánh dấu thư mục này là một package Python.
-    - module1.py, module2.py, ...: Các module của dự án.
-  - **tests/**: Thư mục chứa các tệp kiểm thử.
-    - `__init__.py`: Tệp đánh dấu thư mục này là một package Python.
-    - `test_module1.py`, `test_module2.py`, ...: Các tệp kiểm thử cho các module tương ứng.
-
-- **examples/**: Thư mục chứa các tệp ví dụ sử dụng các module trong dự án.
-
-- **docker/**: Thư mục chứa tất cả các tệp liên quan đến Docker.
-
-  - `Dockerfile`: Tệp Dockerfile để xây dựng hình ảnh Docker cho dự án và định nghĩa môi trường chạy.
-
-  - Các tệp khác liên quan đến Docker như `docker-compose.yml` hoặc các tệp cấu hình Docker khác có thể được thêm vào đây.
-
-- **scripts/**: Thư mục chứa các tập lệnh hoặc script dùng trong dự án.
-
-  - Các tập lệnh hoặc script có thể là các kịch bản tự động hóa công việc, đo lường hiệu suất, hoặc thực hiện các tác vụ quản lý dự án khác.
-
-- **tools/**: Thư mục chứa các công cụ hoặc tệp cụ thể dùng cho dự án.
-
-  - Các tệp hoặc thư mục khác có thể bao gồm các kịch bản, các công cụ hỗ trợ tự động hóa công việc phát triển hoặc quản lý mã nguồn.

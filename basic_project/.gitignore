@@ -1,0 +1,4 @@
+.conda
+.venv
+__pycache__
+poppler-*

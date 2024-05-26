@@ -58,4 +58,4 @@ def create_project_structure(project_name):
 
 
 # Sử dụng hàm để tạo cấu trúc thư mục
-create_project_structure("text_summarizer")
+create_project_structure("basic_project")
