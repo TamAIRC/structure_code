@@ -1,5 +1,20 @@
 # Git Workflow
 
+Mô tả Workflow làm việc của team khi triển khai dự án
+
+## Table of Contents
+
+- [Git Workflow](#git-workflow)
+  - [Table of Contents](#table-of-contents)
+  - [1. Branch structure (Branching Strategy)](#1-branch-structure-branching-strategy)
+  - [2. Workflow](#2-workflow)
+    - [Quy trình tạo và phát triển nhánh tính năng:](#quy-trình-tạo-và-phát-triển-nhánh-tính-năng)
+    - [Quy trình tạo và phát triển nhánh thử nghiệm:](#quy-trình-tạo-và-phát-triển-nhánh-thử-nghiệm)
+    - [Quy trình sửa lỗi khẩn cấp:](#quy-trình-sửa-lỗi-khẩn-cấp)
+  - [3. Quy tắc Commit và Pull Request](#3-quy-tắc-commit-và-pull-request)
+    - [Quy tắc Commit:](#quy-tắc-commit)
+    - [Quy tắc Pull Request:](#quy-tắc-pull-request)
+
 ## 1. Branch structure (Branching Strategy)
 
 **Các loại nhánh cơ bản:**
