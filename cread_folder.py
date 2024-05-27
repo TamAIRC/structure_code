@@ -37,6 +37,7 @@ def create_project_structure(project_name):
         "setup.py",
         ".gitignore",
         "configs/__init__.py",
+        "configs/config.py",
         "configs/app_config.py",
         "configs/db_config.py",
         "configs/logging_config.py",
@@ -95,7 +96,7 @@ def create_project_structure(project_name):
     main_gitignore_content = """.conda\n.venv\n__pycache__\npoppler-*"""
     # Content for the nested .gitignore files
     nested_gitignore_content = "*\n!.gitignore"
-
+    config_base_content = "import os\nBASE_PATH = os.path.dirname(__file__)"
     for f in files:
         file_path = os.path.join(project_name, f)
         with open(file_path, "w") as file:
@@ -107,6 +108,8 @@ def create_project_structure(project_name):
                 file.write(f"# {project_name}\n\nProject description here.")
             elif f == "requirements.txt":
                 file.write("# List of dependencies\n")
+            elif f == "configs/config.py":
+                file.write(config_base_content)
             elif f == "setup.py":
                 file.write(
                     """from setuptools import setup, find_packages
