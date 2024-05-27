@@ -1,1 +1,0 @@
-# modules/module1/self_model/user_model.py

@@ -1,1 +1,0 @@
-# modules/module1/controllers/product_controller.py

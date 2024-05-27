@@ -75,7 +75,7 @@
 │
 ├── /modules          # Thư mục chứa mã nguồn chính của các module dịch vụ
 │   ├── __init__.py
-│   └── /module1      # Thư mục của module 1
+│   └── /module_ex      # Thư mục của module 1
 │       ├── /controllers      # Thư mục chứa các bộ điều khiển của module (logic điều hướng)
 │       │   ├── __init__.py
 │       │   ├── user_controller.py
@@ -166,7 +166,7 @@
   - `string_utils.py`: Các hàm tiện ích liên quan đến chuỗi.
 - `/modules`: Thư mục chứa mã nguồn chính của các module dịch vụ.
   - `**init**.py`: Khởi tạo package modules.
-  - `/module1`: Thư mục của module 1.
+  - `/module_ex`: Thư mục của module 1.
     - `/controllers`: Thư mục chứa các bộ điều khiển của module (logic điều hướng).
       - `**init**.py`: Khởi tạo package controllers của module.
     - `/self_model`: Thư mục chứa các business model riêng của module.

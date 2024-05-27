@@ -1,1 +1,0 @@
-# modules/module1/controllers/__init__.py
