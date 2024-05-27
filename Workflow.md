@@ -14,6 +14,7 @@ Mô tả Workflow làm việc của team khi triển khai dự án
   - [3. Quy tắc Commit và Pull Request](#3-quy-tắc-commit-và-pull-request)
     - [Quy tắc Commit:](#quy-tắc-commit)
     - [Quy tắc Pull Request:](#quy-tắc-pull-request)
+    - [Tóm Tắt Các Bước:](#tóm-tắt-các-bước)
 
 ## 1. Branch structure (Branching Strategy)
 
@@ -123,3 +124,12 @@ git commit -m "OOP: Thêm ví dụ về kế thừa và đa hình"
 **Kiểm tra và phản hồi:**
 
 - Các thành viên trong nhóm nên kiểm tra mã nguồn, đưa ra phản hồi và thảo luận về các khái niệm hoặc mẫu thiết kế.
+
+### Tóm Tắt Các Bước:
+
+- `Tạo Issue`: Mô tả tính năng hoặc vấn đề.
+- `Tạo nhánh feature`: Phát triển và đẩy lên.
+- `Tạo PR từ feature đến develop`: Code review và hợp nhất.
+- `Tạo nhánh experiment`: Thử nghiệm và đẩy lên.
+- `Tạo PR từ experiment đến develop`: Code review và hợp nhất.
+- `Merge develop vào deploy`: Triển khai thực tế.
