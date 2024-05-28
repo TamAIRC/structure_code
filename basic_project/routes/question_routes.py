@@ -25,13 +25,25 @@ async def get_questions():
     try:
         question_controller = QuestionController()
         # tach qua trinh xuy ly ket qua controller ra khoi ket quar tra ve cua API
-        return await question_controller.get_questions(N) # tham so
-        
+        await successed, questions question_controller.get_questions(N) # tham so
+        if successed:
+            result = {
+                "status": True,
+                "data": questions
+            }
+            return result
+        else:
+            error_result = {
+                "status": False,
+                "error_code": 202 #loi database server
+                "error_message":err
+            }
+            return error_result
     except Exception as err:
         # ghi log khi co loi
         error_result = {
             "status": False,
-            "error_code": 404
+            "error_code": 404 #loi web_server
             "error_message":err
         }
         return error_result
