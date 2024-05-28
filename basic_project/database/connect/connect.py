@@ -30,10 +30,10 @@ class Connection:
             self.client = None
             self.database = None
     
-    def get_collection(self, collection_name):
-        if self.database is not None: 
-            logging.info('Accessing collection: %s', collection_name)
-            return self.database[collection_name]
-        else:
-            logging.warning('Database not connected. Cannot access collection: %s', collection_name)
-            return None
+    # def get_collection(self, collection_name):
+    #     if self.database is not None: 
+    #         logging.info('Accessing collection: %s', collection_name)
+    #         return self.database[collection_name]
+    #     else:
+    #         logging.warning('Database not connected. Cannot access collection: %s', collection_name)
+    #         return None
