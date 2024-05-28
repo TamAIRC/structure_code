@@ -12,8 +12,24 @@ from utils.json_encoder import convert_objectid_to_str
 
 class QuestionDBA(DBA):
     def __init__(self):
-        super().__init__(db_config.CONNECT['QUESTION_COLLECTION'])
+        super().__init__()
+        # bo xung cau lenh xac dinh collection o day
+        self.connection.database =  db_config.SCHEMA['QUESTION_COLLECTION'] #chu co dinh nghia cho cac schemas
 
+    # dinh nghia lai ham abstract cua lop co so DBA
+    def find_by_id(self, id):
+        try:
+            # open session
+            normalized_id = normalize_id(id)
+            result = self.collection.find_one({"_id": normalized_id})
+            # dong sesion
+            # dong connection
+            return result
+        except ValueError as e:
+            print(e)
+            return None
+
+    
     def get_questions(self, N):
         questions = self.find_many(N, {})
         if questions is None:
