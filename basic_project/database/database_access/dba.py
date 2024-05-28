@@ -35,4 +35,6 @@ class DBA:
     def find_many(self, n, condition):
         pass
     
-    
+    @abstractmethod
+    def insert(self, object):
+        pass
