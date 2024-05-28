@@ -12,15 +12,15 @@ logging.basicConfig(
 )
 
 class Connection:
+    ''' mo ket noi den database, dong ke noi '''
     def __init__(self):
         self.uri = db_config.CONNECT['URL']
         self.database_name = db_config.CONNECT['DATABASE']
         self.client = None
         self.database = None
     
-    def connect_to_mongodb(self):
+    def get_connection(self):
         self.client = MongoClient(self.uri)
-        
         try:
             self.client.admin.command('ping')
             logging.info('Connected to MongoDB')
@@ -29,7 +29,9 @@ class Connection:
             logging.error('MongoDB connection error: %s', err)
             self.client = None
             self.database = None
-    
+    def close_connection(self):
+        self.client.close()
+        
     # def get_collection(self, collection_name):
     #     if self.database is not None: 
     #         logging.info('Accessing collection: %s', collection_name)
