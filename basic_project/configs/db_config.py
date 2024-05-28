@@ -4,5 +4,5 @@ CONNECT = {
     'URL': 'mongodb://localhost:27017',
     'DATABASE': 'dtu',
     'USER': '----',
-    'PASSWORD': '???????'
+    'PASSWORD': '----'
 }
