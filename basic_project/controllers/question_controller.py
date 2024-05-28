@@ -7,11 +7,14 @@ class QuestionController:
     def __init__(self):
         self.question_dba = QuestionDBA()
 
-    async def get_questions(self):
+    async def get_questions(self, N):
         try:
-            questions = self.question_dba.get_100_questions()
-            if not questions:
-                raise HTTPException(status_code=404, detail="No questions found")
-            return {'result': questions}
+            questions = self.question_dba.get_questions()
+            #if not questions:
+                # raise HTTPException(status_code=404, detail="No questions found") Khong bao loi len giao dien tu controller
+            successed = True    
+            return successed, questions
         except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
+            # raise HTTPException(status_code=500, detail=str(e))
+            successed = False
+            return successed, None
