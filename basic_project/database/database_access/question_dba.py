@@ -14,8 +14,8 @@ class QuestionDBA(DBA):
     def __init__(self):
         super().__init__(db_config.CONNECT['QUESTION_COLLECTION'])
 
-    def get_100_questions(self):
-        questions = self.find_many(100, {})
+    def get_questions(self, N):
+        questions = self.find_many(N, {})
         if questions is None:
             return []
         questions_serializable = [convert_objectid_to_str(question) for question in questions]
