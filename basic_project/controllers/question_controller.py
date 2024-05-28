@@ -10,11 +10,10 @@ class QuestionController:
     async def get_questions(self, N):
         try:
             questions = self.question_dba.get_questions()
-            #if not questions:
-                # raise HTTPException(status_code=404, detail="No questions found") Khong bao loi len giao dien tu controller
+            # thuc hien convert ket qua tu list question sang dang mong muon
             successed = True    
             return successed, questions
         except Exception as e:
-            # raise HTTPException(status_code=500, detail=str(e))
+            # phan hoi loi voi ket qua rong
             successed = False
             return successed, None
