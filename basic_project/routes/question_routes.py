@@ -11,8 +11,27 @@ sys.path.append(project_root)
 from controllers.question_controller import QuestionController
 
 router = APIRouter()
-question_controller = QuestionController()
+
 
 @router.get("/questions")
 async def get_questions():
-    return await question_controller.get_questions()
+    # lay N quan sat tu bang cau hoi
+    # tham so hoa (N quan sat)
+    
+    # xu ly authorization
+    # lay tham so len?
+    # xu ly validate tham so 
+    N = 100 # xu ly tu request
+    try:
+        question_controller = QuestionController()
+        # tach qua trinh xuy ly ket qua controller ra khoi ket quar tra ve cua API
+        return await question_controller.get_questions(N) # tham so
+        
+    except Exception as err:
+        # ghi log khi co loi
+        error_result = {
+            "status": False,
+            "error_code": 404
+            "error_message":err
+        }
+        return error_result
