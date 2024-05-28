@@ -1,3 +1,4 @@
+''' thiet ke lop base (co so) cho he thong truy van co so du lieu'''
 # database/database_access/dba.py
 from bson import ObjectId
 import os
@@ -11,6 +12,7 @@ from database.connect.connect import Connection as db_connection
 from utils.util import normalize_id, validate_condition, prepare_bulk_updates
 
 class DBA:
+    # cac thong tin chung cua moi va hanh dong chung cua moi lop quan ly, tuong tac co so du lieu
     def __init__(self, collection_name):
         self.connection = db_connection()
         self.connection.connect_to_mongodb()
