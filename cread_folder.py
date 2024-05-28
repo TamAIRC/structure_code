@@ -35,6 +35,7 @@ def create_project_structure(project_name):
         "setup.py",
         ".gitignore",
         "configs/__init__.py",
+        "configs/config.py",
         "configs/app_config.py",
         "configs/db_config.py",
         "configs/logging_config.py",
