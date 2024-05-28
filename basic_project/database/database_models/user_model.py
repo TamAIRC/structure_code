@@ -1,1 +1,0 @@
-# database/database_models/user_model.py
