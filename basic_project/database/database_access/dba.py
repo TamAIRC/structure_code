@@ -3,6 +3,7 @@
 from bson import ObjectId
 import os
 import sys
+from abc import ABC, abstractmethod 
 
 current_dir = os.path.dirname(__file__)
 project_root = os.path.abspath(os.path.join(current_dir, "../../"))
