@@ -17,15 +17,12 @@ class DBA:
     def __init__(self, collection_name):
         self.connection = db_connection()
         self.connection.connect_to_mongodb()
-        self.collection = self.connection.get_collection(collection_name)
-    
+        # self.collection = self.connection.get_collection(collection_name)
+        
+    @abstractmethod
     def find_by_id(self, id):
-        try:
-            normalized_id = normalize_id(id)
-            return self.collection.find_one({"_id": normalized_id})
-        except ValueError as e:
-            print(e)
-            return None
+        pass
+    
     
     def find_one(self, condition):
         try:
