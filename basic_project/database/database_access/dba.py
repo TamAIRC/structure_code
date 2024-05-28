@@ -22,36 +22,17 @@ class DBA:
     @abstractmethod
     def find_by_id(self, id):
         pass
-    
-    
+
+    @abstractmethod
     def find_one(self, condition):
-        try:
-            validated_condition = validate_condition(condition)
-            return self.collection.find(validated_condition).limit(1)
-        except ValueError as e:
-            print(e)
-            return None
-    
-    def find_many(self, n, condition):
-        try:
-            validated_condition = validate_condition(condition)
-            return list(self.collection.find(validated_condition).limit(n))
-        except ValueError as e:
-            print(e)
-            return None
-    
+        pass
+
+    @abstractmethod
     def update_one_by_id(self, id, new_value):
-        try:
-            normalized_id = normalize_id(id)
-            return self.collection.update_one({"_id": normalized_id}, {"$set": new_value})
-        except ValueError as e:
-            print(e)
-            return None
+        pass
+
+    @abstractmethod
+    def find_many(self, n, condition):
+        pass
     
-    def update_many_by_id(self, ids, new_values):
-        try:
-            bulk_updates = prepare_bulk_updates(ids, new_values)
-            return self.collection.bulk_write(bulk_updates)
-        except ValueError as e:
-            print(e)
-            return None
+    
