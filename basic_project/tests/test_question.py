@@ -6,7 +6,7 @@ current_dir = os.path.dirname(__file__)
 project_root = os.path.abspath(os.path.join(current_dir, "../"))
 sys.path.append(project_root)
 
-from database.database_access.question_dba import QuestionDBA
+from database.dba.question_dba import QuestionDBA
 
 if __name__ == "__main__":
     dba = QuestionDBA()

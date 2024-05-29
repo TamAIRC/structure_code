@@ -1,6 +1,17 @@
-# configs/db_config.py
+from pymongo import MongoClient
+from urllib.parse import quote_plus
+
+# Connection details
 CONNECT = {
-    'URL': 'mongodb://localhost:27017',
-    'DATABASE': 'dtu',
-    'QUESTION_COLLECTION': 'questions'
+    "URL": "cluster0.jmil5cr.mongodb.net",
+    "DATABASE": "dtu",
+    "USER": "admin",
+    "PASSWORD": "admin123",
 }
+
+# URL encode the username and password
+username = quote_plus(CONNECT["USER"])
+password = quote_plus(CONNECT["PASSWORD"])
+
+# Creating the connection string
+CONNECT["URL"] = f"mongodb+srv://{username}:{password}@{CONNECT['URL']}"

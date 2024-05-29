@@ -1,5 +1,5 @@
 # database/database_access/question_dba.py
-from database.database_access.dba import DBA
+from database.dba.dba import DBA
 import os
 import sys
 
