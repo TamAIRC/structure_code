@@ -1,7 +1,7 @@
 # controllers/question_controller.py
 from fastapi import HTTPException
 from typing import List
-from database.database_access.question_dba import QuestionDBA
+from database.dba.question_dba import QuestionDBA
 
 class QuestionController:
     def __init__(self):
