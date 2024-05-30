@@ -15,3 +15,5 @@ password = quote_plus(CONNECT["PASSWORD"])
 
 # Creating the connection string
 CONNECT["URL"] = f"mongodb+srv://{username}:{password}@{CONNECT['URL']}"
+
+SCHEMA = {"QUESTIONS": "questions", "USER": "user"}
