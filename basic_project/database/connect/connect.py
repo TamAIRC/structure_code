@@ -1,5 +1,6 @@
 import logging
 from pymongo import MongoClient
+from pymongo.server_api import ServerApi
 from pymongo.errors import ServerSelectionTimeoutError
 from configs import db_config, logging_config
 
@@ -19,7 +20,7 @@ class Connection:
         self.database = None
     
     def connect_to_mongodb(self):
-        self.client = MongoClient(self.uri)
+        self.client = MongoClient(self.uri, server_api=ServerApi('1'))
         
         try:
             self.client.admin.command('ping')

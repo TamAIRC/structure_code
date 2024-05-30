@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field
 from bson import ObjectId
 from typing import List
 
-class Question(BaseModel):
+class QuestionSchema(BaseModel):
     id: ObjectId
     category: int
     subcategory: str
