@@ -1,25 +1,22 @@
 import os
 import sys
-from abc import ABC, abstractmethod
-from typing import Any, Dict, List
-from bson import ObjectId
+
 
 current_dir = os.path.dirname(__file__)
 project_root = os.path.abspath(os.path.join(current_dir, "../../"))
 sys.path.append(project_root)
 
+from abc import ABC, abstractmethod
+from typing import Any, Dict, List
+from bson import ObjectId
 from database.connect.connect import Connection as db_connection
 
 
 class DBA(ABC):
     def __init__(self, collection_name: str):
         self.connection = db_connection()
-        self.connection.connect_to_mongodb()
+        self.connection.get_connection()
         self.collection = self.connection.get_collection(collection_name)
-
-    def transaction(self, query):
-        """Perform a transaction. Implementation depends on specific use case."""
-        pass
 
     @abstractmethod
     def find_by_id(self, id: ObjectId) -> Any:
