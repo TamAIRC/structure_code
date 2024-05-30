@@ -2,7 +2,7 @@ from bson import ObjectId
 from pymongo.errors import BulkWriteError
 from .dba import DBA
 from utils.util import normalize_id, validate_condition, prepare_bulk_updates
-
+from database.database_models.question_model import QuestionDBO
 class MongoDB_DBA(DBA):
     def __init__(self, connection, collection_name):
         super().__init__(connection, collection_name)
@@ -11,7 +11,7 @@ class MongoDB_DBA(DBA):
     def find_by_id(self, id):
         try:
             normalized_id = normalize_id(id)
-            return self.collection.find_one({"_id": normalized_id})
+            return QuestionDBO.from_json_obj(self.collection.find_one({"_id": normalized_id}))
         except ValueError as e:
             print(e)
             return None
@@ -32,13 +32,15 @@ class MongoDB_DBA(DBA):
             print(e)
             return None
 
-    def update_one_by_id(self, id, new_value):
+    def update_one_by_id(self, document):
         try:
-            normalized_id = normalize_id(id)
-            return self.collection.update_one({"_id": normalized_id}, {"$set": new_value})
+            normalized_id = normalize_id(document['_id'])
+            new_values_dict = {key: value for key, value in document.items() if key != 'id'}
+            return self.collection.update_one({"_id": normalized_id}, {"$set": new_values_dict})
         except ValueError as e:
             print(e)
             return None
+
 
     def update_many_by_id(self, ids, new_values):
         try:

@@ -1,5 +1,5 @@
 # database/database_access/question_dba.py
-from database.database_access.dba import DBA
+from typing import List
 import os
 import sys
 
@@ -9,14 +9,21 @@ sys.path.append(project_root)
 
 from configs import db_config
 from utils.json_encoder import convert_objectid_to_str
+from database.database_access.dba import DBA
+from database.database_models.question_model import QuestionDBO
 
-class QuestionDBA(DBA):
-    def __init__(self):
-        super().__init__(db_config.CONNECT['QUESTION_COLLECTION'])
+class QuestionDBA():
+    def __init__(self, connection):
+        self.dba = DBA.create_dba(db_config.DB_TYPE, connection, db_config.CONNECT['QUESTION_COLLECTION'])
 
-    def get_100_questions(self):
-        questions = self.find_many(100, {})
+    def get_n_questions(self, n: int) -> List[QuestionDBO]:
+        questions = self.dba.find_many(n, {})
         if questions is None:
             return []
-        questions_serializable = [convert_objectid_to_str(question) for question in questions]
-        return questions_serializable
+        return [QuestionDBO.from_json_obj(question) for question in questions]
+    
+    def update_n_questions(self, questions: List[QuestionDBO]):
+        questions_json = [question.to_json() for question in questions]
+        for question in questions_json:
+            print(question)
+            self.dba.update_one_by_id(question)
