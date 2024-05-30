@@ -52,10 +52,9 @@ class QuestionDBA(MongoDB_DBA):
         try:
             # check định dạng dữ liệu
             update_user_data = QuestionSchema(**update_data)
-            result = self.collection.find_one_and_update(
-                {"_id": ObjectId(question_ids)},
-                {"$set": update_user_data.model_dump_json()}
-            )
+            result = self.update_one_by_id(question_ids, 
+                                           update_user_data.model_dump_json())
+            
             print(f'successfully update question with id {question_ids}')
             return result.modified_count
         except ValidationError as e:
@@ -72,16 +71,3 @@ class QuestionDBA(MongoDB_DBA):
         
     #     questions_serializable = [convert_objectid_to_str(question) for question in questions]
     #     return questions_serializable
-    
-    def update_question(self, question_data):
-        '''
-        phải có check định dạng của dữ liệu muốn update
-        -> cần có DBO <=> questionSchema
-        '''
-        try:
-            question = QuestionSchema(**question_data)
-            result  = self.update_one_by_id(question.model_dump_json())
-            return str(result.inserted_id) # vì muốn in nên vì thế ép kiểu str à???
-        except ValidationError as e:
-            print(f"Validation error:", e)
-            return None

@@ -47,17 +47,16 @@ class MongoDB_DBA:
             return []
 
     @abstractmethod
-    def update_one_by_id(self, id, new_value):
+    def update_one_by_id(self, objectid, new_value):
         try:
-            # check định dạng dữ liệu
             result = self.collection.find_one_and_update(
-                {"_id": ObjectId(question_id)},
-                {"$set": update_user_data.model_dump_json()}
+                {"_id": ObjectId(objectid)},
+                {"$set": new_value}
             )
-            print(f'successfully update question with id {question_id}')
+            print(f'successfully update question with id {objectid}')
             return result.modified_count
-        except ValidationError as e:
-            print(f"Validation error: {e}")
+        except Exception as e:
+            print(f"An error occured: {e}")
             return 0
 
     @abstractmethod
