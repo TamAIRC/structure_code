@@ -7,7 +7,7 @@ from configs import db_config
 from logger import logger
 
 from pymongo import MongoClient
-from pymongo.errors import ServerSelectionTimeoutError, ConnectionFailure, PyMongoError
+from pymongo.errors import ServerSelectionTimeoutError, ConnectionFailure
 
 
 class Connection:
@@ -57,29 +57,6 @@ class Connection:
                 )
         else:
             self.logger.log_info("No active MongoDB connection to close")
-
-    def transaction(self, query_func):
-        """Perform a transaction. Implementation depends on specific use case."""
-        if self.client is None:
-            self.logger.log_error("No MongoDB client available for transaction")
-            return None
-
-        with self.client.start_session() as session:
-            try:
-                session.start_transaction()
-                query_func(session)
-                session.commit_transaction()
-                self.logger.log_info("Transaction committed successfully")
-            except (
-                ConnectionFailure,
-                ServerSelectionTimeoutError,
-                PyMongoError,
-            ) as err:
-                self.logger.log_error("Transaction failed", err)
-                session.abort_transaction()
-                self.logger.log_info("Transaction aborted")
-                return None
-        return True
 
 
 if __name__ == "__main__":

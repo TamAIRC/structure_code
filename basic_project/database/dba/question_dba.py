@@ -20,12 +20,36 @@ from database.dba.dba import DBA
 
 from bson import ObjectId
 from typing import Any, Dict, List
+from pymongo.errors import ServerSelectionTimeoutError, ConnectionFailure, PyMongoError
 
 
 class QuestionDBA(DBA):
     def __init__(self):
         super().__init__(db_config.SCHEMA["QUESTIONS"])
         self.collection = self.connection.get_collection(db_config.SCHEMA["QUESTIONS"])
+
+    def base_transaction(self, query_func):
+        """Perform a transaction. Implementation depends on specific use case."""
+        if self.client is None:
+            self.logger.log_error("No MongoDB client available for transaction")
+            return None
+
+        with self.client.start_session() as session:
+            try:
+                session.start_transaction()
+                query_func(session)
+                session.commit_transaction()
+                self.logger.log_info("Transaction committed successfully")
+            except (
+                ConnectionFailure,
+                ServerSelectionTimeoutError,
+                PyMongoError,
+            ) as err:
+                self.logger.log_error("Transaction failed", err)
+                session.abort_transaction()
+                self.logger.log_info("Transaction aborted")
+                return None
+        return True
 
     def find_by_id(self, id: ObjectId, session=None) -> Question:
         try:
@@ -139,9 +163,9 @@ if __name__ == "__main__":
         )
         inserted_id = question_dba.insert(new_question, session=session)
         print(f"Inserted question with ID: {inserted_id}")
-        
+
     # Execute the transaction
-    transaction_result = Connection.transaction(sample_transaction)
+    transaction_result = QuestionDBA.base_transaction(sample_transaction)
     if transaction_result:
         print("Transaction executed successfully")
     else:
