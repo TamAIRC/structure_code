@@ -2,6 +2,7 @@
 from pydantic import BaseModel, Field, ConfigDict
 from bson import ObjectId
 from typing import List, Dict, Any, Union
+from utils import util
 
 class QuestionDBO(BaseModel):
     id: ObjectId = Field(default_factory=ObjectId, alias="_id")
@@ -23,7 +24,10 @@ class QuestionDBO(BaseModel):
     @classmethod
     def from_json_obj(cls, json_obj: Dict[str, Any]):
         """Convert JSON object to data format."""
+        json_obj['_id'] = ObjectId(json_obj['_id'])
+        json_obj['multimedia'] = ObjectId(json_obj['multimedia'])  
         return cls(**json_obj)
+
 
     @classmethod
     def form_array(cls, array: List[Any]):
@@ -45,8 +49,10 @@ class QuestionDBO(BaseModel):
                 setattr(b, attr, value)
 
     def to_json(self) -> Dict[str, Any]:
-        """Convert the Question object to a JSON-serializable dictionary."""
-        return self.model_dump(by_alias=True)
+        data = self.model_dump(by_alias=True)
+        data['_id'] = util.toString(data['_id'])
+        data['multimedia'] = util.toString(data['multimedia'])
+        return data
 
     def to_string(self) -> str:
         """Convert the Question object to a string representation."""

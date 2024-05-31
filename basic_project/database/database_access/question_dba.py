@@ -14,7 +14,7 @@ from database.database_models.question_model import QuestionDBO
 
 class QuestionDBA():
     def __init__(self, connection):
-        self.dba = DBA.create_dba(db_config.DB_TYPE, connection, db_config.CONNECT['QUESTION_COLLECTION'])
+        self.dba = DBA.create_dba(db_config.DB_TYPE, connection, [db_config.CONNECT['QUESTION_COLLECTION']])
 
     def get_n_questions(self, n: int) -> List[QuestionDBO]:
         questions = self.dba.find_many(n, {})

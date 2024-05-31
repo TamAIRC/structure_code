@@ -1,23 +1,22 @@
 # routes/question_routes.py
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query, HTTPException
 from typing import List
 import os
 import sys
-
 current_dir = os.path.dirname(__file__)
 project_root = os.path.abspath(os.path.join(current_dir, "../"))
 sys.path.append(project_root)
 
-from controllers.question_controller import QuestionController
-
+from controllers.get_questions_controller import GetQuestionController
+from controllers.update_questions_controller import UpdateQuestionController
+from utils.util import validate_input
 router = APIRouter()
-
 @router.get("/questions")
 async def get_questions(N: int = Query(100, description="Number of questions to retrieve")):
     try:
-        question_controller = QuestionController()
+        question_controller = GetQuestionController()
         # Fetch questions from the controller
-        successed, questions = await question_controller.get_questions(N) 
+        successed, questions = await question_controller.get_n_questions(N) 
         if successed:
             result = {
                 "status": True,
@@ -34,19 +33,19 @@ async def get_questions(N: int = Query(100, description="Number of questions to 
     except Exception as err:
         error_result = {
             "status": False,
-            "error_code": 404,  # Web server error
+            "error_code": 404,  
             "error_message": str(err)
         }
         return error_result
     
-async def update_questions(questions):
+@router.put("/questions")
+async def update_questions(data: dict):
     try:
-        question_controller = QuestionController()
+        questions = validate_input(data)
+        question_controller = UpdateQuestionController()
         successed = await question_controller.update_n_questions(questions)
         if successed:
-            result = {
-                "status": True
-            }
+            result = {"status": True}
             return result
         else:
             error_result = {
@@ -56,9 +55,4 @@ async def update_questions(questions):
             }
             return error_result
     except Exception as err:
-        error_result = {
-            "status": False,
-            "error_code": 404,  # Web server error
-            "error_message": str(err)
-        }
-        return error_result
+        raise HTTPException(status_code=404, detail=str(err))

@@ -9,6 +9,7 @@ from database.database_connection.connection import Connection
 from configs import db_config
 from database.database_access.dba import DBA
 from database.database_access.question_dba import QuestionDBA
+from database.database_access.result_dba import ResultDBA
 from bson import ObjectId
 from database.database_models.question_model import QuestionDBO
 if __name__ == "__main__":
@@ -27,3 +28,6 @@ if __name__ == "__main__":
     # question_dba.dba.update_many_by_id(ids, new_values)
     print()
     print(question_dba.dba.find_by_id(ObjectId('66260e94a51b34b732f211dd')))
+    
+    # result_dba = ResultDBA(connection)
+    # print(result_dba.get_n_questions("663884b5f6b183dfa7faed6c"))
