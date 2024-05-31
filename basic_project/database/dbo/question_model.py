@@ -8,8 +8,8 @@ current_dir = os.path.dirname(__file__)
 project_root = os.path.abspath(os.path.join(current_dir, "../../"))
 sys.path.append(project_root)
 
-from database.database_models.dbo import DBO
-from database.database_models.fields import PyObjectId
+from database.dbo.dbo import DBO
+from database.dbo.fields import PyObjectId
 
 
 class QuestionDBO(DBO):
