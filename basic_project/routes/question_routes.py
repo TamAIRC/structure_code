@@ -79,16 +79,16 @@ def main():
     asyncio.run(get_questions(100)) 
 
     # Test update_question
-    # new_question_data = {
-    #     "_id": "66260e94a51b34b732f21233",
-    #     "category": "History",
-    #     "subcategory": "VN History",
-    #     "content": "What is the capital of Vietnam?",
-    #     "answers": ["Hanoi", "Ho Chi Minh City", "Da Nang", "Hue"],
-    #     "correct_answer": "Hanoi",
-    #     "multimedia": "66260e86a51b34b732f21182"
-    # }
-    # asyncio.run(update_question(new_question_data))
+    new_question_data = {
+        "_id": "66260e94a51b34b732f21233",
+        "category": "History",
+        "subcategory": "VN History",
+        "content": "What is the capital of Vietnam?",
+        "answers": ["Hanoi", "Ho Chi Minh City", "Da Nang", "Hue"],
+        "correct_answer": "Hanoi",
+        "multimedia": "66260e86a51b34b732f21182"
+    }
+    asyncio.run(update_question(new_question_data))
 
 if __name__ == "__main__":
     main()
