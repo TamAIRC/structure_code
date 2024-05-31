@@ -29,5 +29,5 @@ if __name__ == "__main__":
     print()
     print(question_dba.dba.find_by_id(ObjectId('66260e94a51b34b732f211dd')))
     
-    # result_dba = ResultDBA(connection)
-    # print(result_dba.get_n_questions("663884b5f6b183dfa7faed6c"))
+    result_dba = ResultDBA(connection)
+    print(result_dba.get_n_questions("663884b5f6b183dfa7faed6c"))
