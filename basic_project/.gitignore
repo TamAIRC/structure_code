@@ -4,4 +4,4 @@ __pycache__
 poppler-*
 
 # Logger 
-basic_project/logger/log
+basic_project/logger/log/
