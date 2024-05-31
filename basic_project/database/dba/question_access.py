@@ -10,7 +10,7 @@ sys.path.append(project_root)
 
 from database.database_connection.mongo_connection import MongoConnection
 from database.dba.dba import DBA
-from database.dbo.question_model import Question
+from database.dbo.question_model import QuestionDBO as Question
 from configs.db_config import db_config
 from utils.util import (
     normalize_id,
@@ -19,37 +19,37 @@ from utils.util import (
 )
 
 
-def QuestionDBA(DBA):
+class QuestionDBA(DBA):
     def __init__(self):
-        super().__init__(MongoConnection()[db_config.QUESTION_COLLECTION])
+        super().__init__(MongoConnection().database[db_config.QUESTION_COLLECTION])
     
-    def base_transaction(self, query_func):
+    def transaction(self, query_func, **kwargs):
         """Perform a transaction. Implementation depends on specific use case."""
-        if self.client is None:
-            self.connection.logger.log_error("No MongoDB client available for transaction")
+        if MongoConnection() is None:
+            MongoConnection.logger.log_error("No MongoDB client available for transaction")
             return None
 
-        with self.client.start_session() as session:
+        with MongoConnection().client.start_session() as session:
             try:
                 session.start_transaction()
-                query_func(session)
+                result = query_func(session=session, **kwargs)
                 session.commit_transaction()
-                self.connection.logger.log_info("Transaction committed successfully")
+                MongoConnection.logger.log_info("Transaction committed successfully")
             except (
                 ConnectionFailure,
                 ServerSelectionTimeoutError,
                 PyMongoError,
             ) as err:
-                self.connection.logger.log_error("Transaction failed", err)
+                MongoConnection.logger.log_error("Transaction failed", err)
                 session.abort_transaction()
-                self.connection.logger.log_info("Transaction aborted")
+                MongoConnection.logger.log_info("Transaction aborted")
                 return None
-        return True
+        return result
 
     def find_by_id(self, id: ObjectId, session=None) -> Question:
         try:
             normalized_id = normalize_id(id)
-            result = self.collection.find_one({"_id": normalized_id}, session=session)
+            result = self.connection.find_one({"_id": normalized_id}, session=session)
             if result:
                 return Question(**result)
             return None
@@ -60,7 +60,7 @@ def QuestionDBA(DBA):
     def find_one(self, condition: Dict[str, Any], session=None) -> Question:
         try:
             validated_condition = validate_condition(condition)
-            result = self.collection.find_one(validated_condition, session=session)
+            result = self.connection.find_one(validated_condition, session=session)
             if result:
                 return Question(**result)
             return None
@@ -73,7 +73,7 @@ def QuestionDBA(DBA):
     ) -> List[Question]:
         try:
             validated_condition = validate_condition(condition)
-            cursor = self.collection.find(validated_condition, session=session).limit(n)
+            cursor = self.connection.find(validated_condition, session=session).limit(n)
             return [Question(**data) for data in cursor]
         except ValueError as e:
             print(e)
@@ -84,7 +84,7 @@ def QuestionDBA(DBA):
     ) -> bool:
         try:
             normalized_id = normalize_id(id)
-            result = self.collection.update_one(
+            result = self.connection.update_one(
                 {"_id": normalized_id}, {"$set": new_value}, session=session
             )
             return result.modified_count > 0
@@ -97,7 +97,7 @@ def QuestionDBA(DBA):
     ) -> bool:
         try:
             bulk_updates = prepare_bulk_updates(ids, new_values)
-            result = self.collection.bulk_write(bulk_updates, session=session)
+            result = self.connection.bulk_write(bulk_updates, session=session)
             return result.modified_count > 0
         except ValueError as e:
             print(e)
@@ -106,7 +106,7 @@ def QuestionDBA(DBA):
     def insert(self, obj: Question, session=None) -> ObjectId:
         try:
             data = obj.to_json()
-            result = self.collection.insert_one(data, session=session)
+            result = self.connection.insert_one(data, session=session)
             return result.inserted_id
         except ValueError as e:
             print(e)
@@ -115,7 +115,7 @@ def QuestionDBA(DBA):
     def delete_by_id(self, id: ObjectId, session=None) -> bool:
         try:
             normalized_id = normalize_id(id)
-            result = self.collection.delete_one({"_id": normalized_id}, session=session)
+            result = self.connection.delete_one({"_id": normalized_id}, session=session)
             return result.deleted_count > 0
         except ValueError as e:
             print(e)
@@ -125,4 +125,9 @@ def QuestionDBA(DBA):
         questions = self.find_many(N, {}, session=session)
         if questions is None:
             return []
-        return [Question(**question) for question in questions]
+        return questions
+    
+if __name__ == "__main__":
+    question_dba = QuestionDBA()
+    data = question_dba.transaction(question_dba.get_questions, N=5)
+    print(data)

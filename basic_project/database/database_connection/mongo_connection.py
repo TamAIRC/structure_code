@@ -13,6 +13,7 @@ class MongoConnection:
             cls._instance = super(MongoConnection, cls).__new__(cls)
             try:
                 cls._instance.client = MongoClient(db_config.URI, server_api=ServerApi('1'))
+                cls._instance.database = cls._instance.client[db_config.DATABASE]
             except Exception as e:
                 cls.logger.log_error("An error occurred while connecting to MongoDB", e)
         return cls._instance
