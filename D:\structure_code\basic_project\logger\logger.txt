@@ -1,0 +1,2 @@
+2024-05-31 11:40:24 - root - INFO - Connected to MongoDB
+2024-05-31 11:40:24 - root - INFO - Accessing collection: questions

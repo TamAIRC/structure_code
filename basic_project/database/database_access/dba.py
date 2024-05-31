@@ -27,22 +27,35 @@ class DBA:
     thì phải sửa cả ở đây và các sub-dba khác
     
     '''
-    @abstractmethod
-    def find_by_id(self, id):
-        pass
-
+    
     @abstractmethod
     def find_one(self, condition):
         pass
 
     @abstractmethod
-    def update_one_by_id(self, id, new_value):
-        pass
-
-    @abstractmethod
     def find_many(self, object, condition=None):
         pass
+    
+    @abstractmethod
+    def update_one(self, id, new_value):
+        pass
+    
+    @abstractmethod
+    def update_many(self, id, new_value):
+        pass
+    
+    @abstractmethod
+    def insert_one(self, id, new_value):
+        pass
 
     @abstractmethod
-    def insert(self, object):
+    def insert_many(self, object):
+        pass
+    
+    @abstractmethod
+    def delete_one(self, object):
+        pass
+    
+    @abstractmethod
+    def delete_many(self, object):
         pass

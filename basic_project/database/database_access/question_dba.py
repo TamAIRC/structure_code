@@ -25,15 +25,24 @@ class QuestionDBA(MongoDB_DBA):
         super().__init__(db_config.CONNECT['QUESTION_COLLECTION'])
     
     def get_one_question(self, id):
-        question = self.find_one(id)
+        question = self.find_one_by_id(id)
         if question is None:
             print('No questions found')
             return []
-        pass
+        # questions_serializable = convert_objectid_to_str(question)
+        # return questions_serializable
+        return question
     
-    def get_questions(self, object_ids):
-        object_ids = [normalize_id(id) for id in object_ids]
-        questions = self.find_many(object_ids)
+    def get_n_questions(self, num_ques):
+        """_summary_
+
+        Args:
+            num_ques (_type_): number of questions wanted to take
+
+        Returns:
+            list: list of question ID
+        """
+        questions = self.find_many(num_ques)
         #TODO save to log
         if questions is None:
             print('No questions found')
@@ -43,7 +52,7 @@ class QuestionDBA(MongoDB_DBA):
             return questions_serializable
     
     # viết để handle được cả update 1 và many
-    def update_question_by_id(self, question_ids, update_data):
+    def update_one_question(self, question_id, update_data):
         '''
         được update hết tất cả giá trị thay đổi à?
         có cần check quyền không
@@ -52,22 +61,20 @@ class QuestionDBA(MongoDB_DBA):
         try:
             # check định dạng dữ liệu
             update_user_data = QuestionSchema(**update_data)
-            result = self.update_one_by_id(question_ids, 
+            result = self.update_one_by_id(question_id, 
                                            update_user_data.model_dump_json())
-            
-            print(f'successfully update question with id {question_ids}')
+            print(f'successfully update question with id {question_id}')
             return result.modified_count
         except ValidationError as e:
             print(f"Validation error: {e}")
-            return 0
-        
+            return None
     
-        
-    # def get_100_questions(self, objectList):
-    #     questions = self.find_many(objectList, {})
-        
-    #     if questions is None:
-    #         return []
-        
-    #     questions_serializable = [convert_objectid_to_str(question) for question in questions]
-    #     return questions_serializable
+    def update_many_question(self, condition, update_value):
+        try:
+            # cái này đang không đúng vì update value là một tập dict
+            update_value = QuestionSchema(**update_value)
+            results = self.update_many(condition=condition,
+                                       update_fields=update_value)
+        except ValidationError as e:
+            print(f"Validation error: {e}")
+            return None
