@@ -6,7 +6,6 @@ from logger.logger import Logger
 
 class MongoConnection:
     _instance = None
-    logger = Logger()
     
     def __new__(cls):
         if cls._instance is None:
@@ -14,6 +13,7 @@ class MongoConnection:
             try:
                 cls._instance.client = MongoClient(db_config.URI, server_api=ServerApi('1'))
                 cls._instance.database = cls._instance.client[db_config.DATABASE]
+                cls._instance.logger = Logger('MongoDBLogger')
             except Exception as e:
-                cls.logger.log_error("An error occurred while connecting to MongoDB", e)
+                Logger('MongoDBLogger').log_error("An error occurred while connecting to MongoDB", e)
         return cls._instance

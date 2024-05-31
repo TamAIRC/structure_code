@@ -1,6 +1,6 @@
-# logger/logger.py
 import os
 import sys
+import logging
 
 __dir__ = os.path.dirname(__file__)
 sys.path.append(os.path.join(__dir__, "../../"))
@@ -8,10 +8,16 @@ from logger.log_formatter import TimezoneFormatter
 from configs import config, logging_config
 
 
-import logging
+class LoggerMeta(type):
+    _instances = {}
+
+    def __call__(cls, name="MongoDBLogger", *args, **kwargs):
+        if name not in cls._instances:
+            cls._instances[name] = super().__call__(name, *args, **kwargs)
+        return cls._instances[name]
 
 
-class Logger:
+class Logger(metaclass=LoggerMeta):
     def __init__(self, name="MongoDBLogger"):
         # Configure logging
         logging.basicConfig(

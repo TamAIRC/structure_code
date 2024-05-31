@@ -26,7 +26,7 @@ class QuestionDBA(DBA):
     def transaction(self, query_func, **kwargs):
         """Perform a transaction. Implementation depends on specific use case."""
         if MongoConnection() is None:
-            MongoConnection.logger.log_error("No MongoDB client available for transaction")
+            MongoConnection().logger.log_error("No MongoDB client available for transaction")
             return None
 
         with MongoConnection().client.start_session() as session:
@@ -34,15 +34,15 @@ class QuestionDBA(DBA):
                 session.start_transaction()
                 result = query_func(session=session, **kwargs)
                 session.commit_transaction()
-                MongoConnection.logger.log_info("Transaction committed successfully")
+                MongoConnection().logger.log_info("Transaction committed successfully")
             except (
                 ConnectionFailure,
                 ServerSelectionTimeoutError,
                 PyMongoError,
             ) as err:
-                MongoConnection.logger.log_error("Transaction failed", err)
+                MongoConnection().logger.log_error("Transaction failed", err)
                 session.abort_transaction()
-                MongoConnection.logger.log_info("Transaction aborted")
+                MongoConnection().logger.log_info("Transaction aborted")
                 return None
         return result
 
