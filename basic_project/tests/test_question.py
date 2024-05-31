@@ -13,3 +13,4 @@ if __name__ == "__main__":
     result = ques_controller.get_one_question_by_id("66260e94a51b34b732f211dd")
     # result1 = dba.get_100_questions()
     print(result)
+    

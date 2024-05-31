@@ -3,7 +3,7 @@ from fastapi import HTTPException
 from typing import List
 from database.database_access.question_dba import QuestionDBA
 from bson import ObjectId
-
+from utils.util import normalize_id, serialize_mongo_document
 
 class QuestionController:
     def __init__(self):
@@ -14,12 +14,15 @@ class QuestionController:
             if not isinstance(question_id, ObjectId):
                 question_id = ObjectId(question_id)
                 result = self.question_dba.get_one_question(question_id)
+                result = serialize_mongo_document(result)
+                return result
+            else:
+                result = self.question_dba.get_one_question(question_id)
                 return result
         except Exception as e:
-            print(f'An error occured {e}')
+            print(f'An error occured {e} in question controller')
 
-    async def get_n_questions(self, n):
-
+    def get_n_questions(self, n):
         try:
             questions = self.question_dba.get_100_questions()
             if not questions:
