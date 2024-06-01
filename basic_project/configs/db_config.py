@@ -1,4 +1,3 @@
-from pymongo import MongoClient
 from urllib.parse import quote_plus
 
 # Connection details
@@ -16,4 +15,8 @@ password = quote_plus(CONNECT["PASSWORD"])
 # Creating the connection string
 CONNECT["URL"] = f"mongodb+srv://{username}:{password}@{CONNECT['URL']}"
 
-SCHEMA = {"QUESTIONS": "questions", "USER": "user"}
+SCHEMA = {
+    "QUESTIONS": "questions",
+    "USER": "user",
+    "ANSWERED_QUESTIONS": "answered_questions",
+}
