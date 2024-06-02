@@ -16,6 +16,7 @@ from utils.json_encoder import convert_objectid_to_str
 
 from database.dbo.question_dbo import QuestionDBO
 from database.dba.dba import DBA
+from logger.logger import Logger
 
 from bson import ObjectId
 from typing import Any, Dict, List
@@ -23,32 +24,32 @@ from pymongo.errors import ServerSelectionTimeoutError, ConnectionFailure, PyMon
 
 
 class QuestionDBA(DBA):
-    def __init__(self, connection):
+    def __init__(self):
         super().__init__(db_config.SCHEMA["QUESTIONS"])
-        self.dba = DBA.create_dba(
-            db_config.DB_TYPE, connection, [db_config.CONNECT["QUESTION_COLLECTION"]]
-        )
+        self.collection = self.connection.get_collection(db_config.SCHEMA["QUESTIONS"])
+        self.logger = Logger("MongoDB_DBA")
 
     def transaction(self, query_func, **kwargs):
         """Perform a transaction. Implementation depends on specific use case."""
-        if self.client is None:
+        if self.connection.client is None:
             self.logger.log_error("No MongoDB client available for transaction")
             return None
 
-        with self.client.start_session() as session:
+        with self.connection.client.start_session() as session:
             try:
                 session.start_transaction()
+                self.logger.log_info("Transaction started")
                 result = query_func(session=session, **kwargs)
                 session.commit_transaction()
-                self.client.logger.log_info("Transaction committed successfully")
+                self.logger.log_info("Transaction committed successfully")
             except (
                 ConnectionFailure,
                 ServerSelectionTimeoutError,
                 PyMongoError,
             ) as err:
-                self.client.logger.log_error("Transaction failed", err)
+                self.logger.log_error("Transaction failed", err)
                 session.abort_transaction()
-                self.client.logger.log_info("Transaction aborted")
+                self.logger.log_info("Transaction aborted")
                 return None
         return result
 
@@ -59,8 +60,8 @@ class QuestionDBA(DBA):
             if result:
                 return QuestionDBO(**result)
             return None
-        except ValueError as e:
-            print(e)
+        except ValueError as err:
+            self.logger.log_error("Error in find_by_id", err)
             return None
 
     def find_one(self, condition: Dict[str, Any], session=None) -> QuestionDBO:
@@ -70,8 +71,8 @@ class QuestionDBA(DBA):
             if result:
                 return QuestionDBO(**result)
             return None
-        except ValueError as e:
-            print(e)
+        except ValueError as err:
+            self.logger.log_error("Error in find one", err)
             return None
 
     def find_many(
@@ -81,9 +82,30 @@ class QuestionDBA(DBA):
             validated_condition = validate_condition(condition)
             cursor = self.collection.find(validated_condition, session=session).limit(n)
             return [QuestionDBO(**data) for data in cursor]
-        except ValueError as e:
-            print(e)
+        except ValueError as err:
+            self.logger.log_error("Error in find_many", err)
             return None
+
+    def get_n_questions(self, N, session=None) -> List[QuestionDBO]:
+        questions = self.find_many(N, {}, session=session)
+        try:
+            self.logger.log_info("Fetching questions")
+            questions = self.find_many(N, {}, session=session)
+            if questions is None:
+                self.logger.log_info("No questions found")
+                return []
+            questions_serializable = [
+                convert_objectid_to_str(question) for question in questions
+            ]
+            return questions_serializable
+        except Exception as err:
+            self.logger.log_error("Error in get_n_questions", err)
+            return []
+
+    def update_n_questions(self, questions: List[QuestionDBO]) -> bool:
+        questions_json = [question.to_json() for question in questions]
+        for question in questions_json:
+            self.update_one_by_id(ObjectId(question["_id"]), question)
 
     def update_one_by_id(
         self, id: ObjectId, new_value: Dict[str, Any], session=None
@@ -95,7 +117,8 @@ class QuestionDBA(DBA):
             )
             return result.modified_count > 0
         except ValueError as e:
-            print(e)
+            self.logger.log_error("Error in update_one_by_id", {e})
+
             return False
 
     def update_many_by_id(
@@ -106,7 +129,7 @@ class QuestionDBA(DBA):
             result = self.collection.bulk_write(bulk_updates, session=session)
             return result.modified_count > 0
         except ValueError as e:
-            print(e)
+            self.logger.log_error("Error in update_many_by_id", {e})
             return False
 
     def insert(self, obj: QuestionDBO, session=None) -> ObjectId:
@@ -115,7 +138,8 @@ class QuestionDBA(DBA):
             result = self.collection.insert_one(data, session=session)
             return result.inserted_id
         except ValueError as e:
-            print(e)
+            self.logger.log_error("Error in insert", {e})
+
             return None
 
     def delete_by_id(self, id: ObjectId, session=None) -> bool:
@@ -124,17 +148,9 @@ class QuestionDBA(DBA):
             result = self.collection.delete_one({"_id": normalized_id}, session=session)
             return result.deleted_count > 0
         except ValueError as e:
-            print(e)
+            self.logger.log_error("Error in delete_by_id", {e})
             return False
 
-    def get_questions(self, N, session=None):
-        questions = self.find_many(N, {}, session=session)
-        if questions is None:
-            return []
-        questions_serializable = [
-            convert_objectid_to_str(question) for question in questions
-        ]
-        return questions_serializable
     def join_collections(self, collection_names):
         try:
             pipeline = [
@@ -166,23 +182,28 @@ class QuestionDBA(DBA):
                 self.collection.insert_many(joined_data)
             return self.collection
         except Exception as e:
-            print(e)
+            self.logger.log_error(f"Error in join_collections", {e})
             return None
+
 
 if __name__ == "__main__":
     # Example usage
     question_dba = QuestionDBA()
-    data = question_dba.transaction(question_dba.get_questions, N=5)
+    data = question_dba.transaction(question_dba.get_n_questions, N=5)
+    data = question_dba.get_n_questions(N=5)
     print(data)
 
     # Insert a new question
-    # new_question = Question(
+    # new_question = QuestionDBO(
     #     id=ObjectId(),
     #     category=1,
     #     subcategory="Math",
     #     content="What is 2+2?",
     #     answers=["2", "3", "4", "5"],
     #     correct_answer="4",
+    #     difficulty="5",
+    #     required_rank="2",
+    #     language="2",
     #     multimedia=ObjectId(),
     # )
 
@@ -198,12 +219,12 @@ if __name__ == "__main__":
     #     inserted_id, {"content": "What is 3+3?"}
     # )
     # print(f"Update successful: {update_result}")
+    # if update_result:
+    #     # Find many questions
+    #     questions = question_dba.find_many(5, {"category": 1})
+    #     for q in questions:
+    #         print(q)
 
-    # # Find many questions
-    # questions = question_dba.find_many(5, {"category": 1})
-    # for q in questions:
-    #     print(q)
-
-    # # Delete a question by ID
-    # delete_result = question_dba.delete_by_id(inserted_id)
-    # print(f"Delete successful: {delete_result}")
+    #     # Delete a question by ID
+    #     delete_result = question_dba.delete_by_id(inserted_id)
+    #     print(f"Delete successful: {delete_result}")

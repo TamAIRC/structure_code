@@ -10,12 +10,15 @@ from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Type
 from bson import ObjectId
 
+from database.connect.mongo_connection import MongoConnection as db_connection
+
 
 class DBA(ABC):
-    def __init__(self, connection, collection_name: str):
-        self.connection = connection
-        self.collection_name = collection_name
+    def __init__(self, collection_name: str):
+        self.connection = db_connection()
+        self.collection = self.connection.get_collection(collection_name)
 
+    #! Chưa sử dụng hợp ý được
     @staticmethod
     def create_dba(dba_type: str, connection, collection_name: str) -> "DBA":
         dba_classes: Dict[str, str] = {
@@ -36,6 +39,10 @@ class DBA(ABC):
             return dba_class(connection, collection_name)
         except (ImportError, AttributeError) as e:
             raise ImportError(f"Error importing '{dba_type}' DBA class: {e}")
+
+    def transaction(self, query):
+        """Perform a transaction. Implementation depends on specific use case."""
+        pass
 
     @abstractmethod
     def find_by_id(self, id: ObjectId) -> Any:

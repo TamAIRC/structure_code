@@ -5,7 +5,7 @@ import sys
 current_dir = os.path.dirname(__file__)
 project_root = os.path.abspath(os.path.join(current_dir, "../../"))
 sys.path.append(project_root)
-from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
+from pydantic import BaseModel, Field, ValidationError, field_validator
 from bson import ObjectId
 from typing import List, Dict, Any, Union
 from utils import util
@@ -23,7 +23,29 @@ class QuestionDBO(BaseModel):
     language: int
     multimedia: ObjectId
 
-    model_config = ConfigDict(arbitrary_types_allowed=True)
+    class Config:
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+        populate_by_name = True
+
+    # Tham khảo, trong tương lai có thể sử dụng validate điều kiên đặc biệt
+    # @field_validator("difficulty", "required_rank", "language")
+    # def validate_integers(cls, value, field):
+    #     if not isinstance(value, int):
+    #         raise ValueError(f"{field.name} must be an integer")
+    #     return value
+
+    # @field_validator("category")
+    # def validate_category(cls, value):
+    #     if not isinstance(value, (int, str)):
+    #         raise ValueError("category must be an integer or string")
+    #     return value
+
+    # @field_validator("answers")
+    # def validate_answers(cls, value):
+    #     if not isinstance(value, list) or not all(isinstance(i, str) for i in value):
+    #         raise ValueError("answers must be a list of strings")
+    #     return value
 
     @classmethod
     def from_json_obj(self, json_obj: Dict[str, Any]):
@@ -33,6 +55,11 @@ class QuestionDBO(BaseModel):
         if isinstance(json_obj.get("multimedia"), str):
             json_obj["multimedia"] = ObjectId(json_obj["multimedia"])
         return self(**json_obj)
+
+    # @classmethod
+    # def from_json_obj(self, json_obj: Dict[str, Any]):
+    #     """Convert JSON object to data format."""
+    #     return QuestionDBO(**json_obj)
 
     @classmethod
     def form_array(self, array: List[Any]):
@@ -66,25 +93,6 @@ class QuestionDBO(BaseModel):
     def to_string(self) -> str:
         """Convert the Question object to a string representation."""
         return str(self.model_dump(by_alias=True))
-
-    # Tham khảo, trong tương lai có thể sử dụng validate điều kiên đặc biệt
-    # @field_validator("difficulty", "required_rank", "language")
-    # def validate_integers(cls, value, field):
-    #     if not isinstance(value, int):
-    #         raise ValueError(f"{field.name} must be an integer")
-    #     return value
-
-    # @field_validator("category")
-    # def validate_category(cls, value):
-    #     if not isinstance(value, (int, str)):
-    #         raise ValueError("category must be an integer or string")
-    #     return value
-
-    # @field_validator("answers")
-    # def validate_answers(cls, value):
-    #     if not isinstance(value, list) or not all(isinstance(i, str) for i in value):
-    #         raise ValueError("answers must be a list of strings")
-    #     return value
 
     def get_id(self):
         """Return the ID of the question."""
