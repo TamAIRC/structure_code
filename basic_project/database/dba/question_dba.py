@@ -6,7 +6,6 @@ current_dir = os.path.dirname(__file__)
 project_root = os.path.abspath(os.path.join(current_dir, "../../"))
 sys.path.append(project_root)
 
-from database.connect.connect import Connection
 from configs import db_config
 from utils.util import (
     normalize_id,
@@ -15,7 +14,7 @@ from utils.util import (
 )
 from utils.json_encoder import convert_objectid_to_str
 
-from database.dbo.question_dbo import QuestionDBO as Question
+from database.dbo.question_dbo import QuestionDBO
 from database.dba.dba import DBA
 
 from bson import ObjectId
@@ -24,11 +23,13 @@ from pymongo.errors import ServerSelectionTimeoutError, ConnectionFailure, PyMon
 
 
 class QuestionDBA(DBA):
-    def __init__(self):
+    def __init__(self, connection):
         super().__init__(db_config.SCHEMA["QUESTIONS"])
-        self.collection = self.connection.get_collection(db_config.SCHEMA["QUESTIONS"])
+        self.dba = DBA.create_dba(
+            db_config.DB_TYPE, connection, [db_config.CONNECT["QUESTION_COLLECTION"]]
+        )
 
-    def base_transaction(self, query_func):
+    def transaction(self, query_func, **kwargs):
         """Perform a transaction. Implementation depends on specific use case."""
         if self.client is None:
             self.logger.log_error("No MongoDB client available for transaction")
@@ -37,37 +38,37 @@ class QuestionDBA(DBA):
         with self.client.start_session() as session:
             try:
                 session.start_transaction()
-                query_func(session)
+                result = query_func(session=session, **kwargs)
                 session.commit_transaction()
-                self.logger.log_info("Transaction committed successfully")
+                self.client.logger.log_info("Transaction committed successfully")
             except (
                 ConnectionFailure,
                 ServerSelectionTimeoutError,
                 PyMongoError,
             ) as err:
-                self.logger.log_error("Transaction failed", err)
+                self.client.logger.log_error("Transaction failed", err)
                 session.abort_transaction()
-                self.logger.log_info("Transaction aborted")
+                self.client.logger.log_info("Transaction aborted")
                 return None
-        return True
+        return result
 
-    def find_by_id(self, id: ObjectId, session=None) -> Question:
+    def find_by_id(self, id: ObjectId, session=None) -> QuestionDBO:
         try:
             normalized_id = normalize_id(id)
             result = self.collection.find_one({"_id": normalized_id}, session=session)
             if result:
-                return Question(**result)
+                return QuestionDBO(**result)
             return None
         except ValueError as e:
             print(e)
             return None
 
-    def find_one(self, condition: Dict[str, Any], session=None) -> Question:
+    def find_one(self, condition: Dict[str, Any], session=None) -> QuestionDBO:
         try:
             validated_condition = validate_condition(condition)
             result = self.collection.find_one(validated_condition, session=session)
             if result:
-                return Question(**result)
+                return QuestionDBO(**result)
             return None
         except ValueError as e:
             print(e)
@@ -75,11 +76,11 @@ class QuestionDBA(DBA):
 
     def find_many(
         self, n: int, condition: Dict[str, Any], session=None
-    ) -> List[Question]:
+    ) -> List[QuestionDBO]:
         try:
             validated_condition = validate_condition(condition)
             cursor = self.collection.find(validated_condition, session=session).limit(n)
-            return [Question(**data) for data in cursor]
+            return [QuestionDBO(**data) for data in cursor]
         except ValueError as e:
             print(e)
             return None
@@ -108,7 +109,7 @@ class QuestionDBA(DBA):
             print(e)
             return False
 
-    def insert(self, obj: Question, session=None) -> ObjectId:
+    def insert(self, obj: QuestionDBO, session=None) -> ObjectId:
         try:
             data = obj.to_json()
             result = self.collection.insert_one(data, session=session)
@@ -134,11 +135,45 @@ class QuestionDBA(DBA):
             convert_objectid_to_str(question) for question in questions
         ]
         return questions_serializable
+    def join_collections(self, collection_names):
+        try:
+            pipeline = [
+                {
+                    "$lookup": {
+                        "from": collection_names[1],
+                        "localField": "questions._id",
+                        "foreignField": "_id",
+                        "as": "questions_detail",
+                    }
+                },
+                {"$unwind": "$questions_detail"},
+                {
+                    "$replaceRoot": {
+                        "newRoot": {"$mergeObjects": ["$$ROOT", "$questions_detail"]}
+                    }
+                },
+            ]
 
+            local_collection_name = collection_names[0]
+            joined_data = list(
+                self.collections[local_collection_name].aggregate(pipeline)
+            )
+
+            # Use a temporary collection to store the joined data
+            self.collection = self.connection.database["joined_collection"]
+            self.collection.drop()  # Clear the collection if it exists
+            if joined_data:
+                self.collection.insert_many(joined_data)
+            return self.collection
+        except Exception as e:
+            print(e)
+            return None
 
 if __name__ == "__main__":
     # Example usage
     question_dba = QuestionDBA()
+    data = question_dba.transaction(question_dba.get_questions, N=5)
+    print(data)
 
     # Insert a new question
     # new_question = Question(
@@ -150,26 +185,7 @@ if __name__ == "__main__":
     #     correct_answer="4",
     #     multimedia=ObjectId(),
     # )
-    def sample_transaction(session):
-        # Insert a new question within the transaction
-        new_question = Question(
-            id=ObjectId(),
-            category=1,
-            subcategory="Math",
-            content="What is 2+2?",
-            answers=["2", "3", "4", "5"],
-            correct_answer="4",
-            multimedia=ObjectId(),
-        )
-        inserted_id = question_dba.insert(new_question, session=session)
-        print(f"Inserted question with ID: {inserted_id}")
 
-    # Execute the transaction
-    transaction_result = QuestionDBA.base_transaction(sample_transaction)
-    if transaction_result:
-        print("Transaction executed successfully")
-    else:
-        print("Transaction failed")
     # inserted_id = question_dba.insert(new_question)
     # print(f"Inserted question with ID: {inserted_id}")
 

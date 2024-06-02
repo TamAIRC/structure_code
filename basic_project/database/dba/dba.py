@@ -7,16 +7,35 @@ project_root = os.path.abspath(os.path.join(current_dir, "../../"))
 sys.path.append(project_root)
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Type
 from bson import ObjectId
-from database.connect.connect import Connection as db_connection
 
 
 class DBA(ABC):
-    def __init__(self, collection_name: str):
-        self.connection = db_connection()
-        self.connection.get_connection()
-        self.collection = self.connection.get_collection(collection_name)
+    def __init__(self, connection, collection_name: str):
+        self.connection = connection
+        self.collection_name = collection_name
+
+    @staticmethod
+    def create_dba(dba_type: str, connection, collection_name: str) -> "DBA":
+        dba_classes: Dict[str, str] = {
+            "mongo": "database.dba.mongodb_dba.MongoDB_DBA",
+            "sql": "database.dba.sql_dba.SQL_DBA",
+        }
+
+        if dba_type not in dba_classes:
+            raise ValueError(
+                f"Unsupported DBA type '{dba_type}'. Supported types are: {', '.join(dba_classes.keys())}"
+            )
+
+        module_name, class_name = dba_classes[dba_type].rsplit(".", 1)
+
+        try:
+            module = __import__(module_name, fromlist=[class_name])
+            dba_class: Type[DBA] = getattr(module, class_name)
+            return dba_class(connection, collection_name)
+        except (ImportError, AttributeError) as e:
+            raise ImportError(f"Error importing '{dba_type}' DBA class: {e}")
 
     @abstractmethod
     def find_by_id(self, id: ObjectId) -> Any:

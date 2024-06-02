@@ -1,5 +1,7 @@
 from urllib.parse import quote_plus
 
+DB_TYPE = "mongo"
+
 # Connection details
 CONNECT = {
     "URL": "cluster0.jmil5cr.mongodb.net",

@@ -12,7 +12,7 @@ import logging
 
 
 class Logger:
-    def __init__(self, name="MongoDBLogger"):
+    def __init__(self, name="Logger"):
         # Configure logging
         logging.basicConfig(
             filename=logging_config.LOGGER_FILE,
