@@ -5,7 +5,7 @@ import sys
 __dir__ = os.path.dirname(__file__)
 sys.path.append(os.path.join(__dir__, "../../"))
 from logger.log_formatter import TimezoneFormatter
-from configs import config, logging_config
+from configs import app_config, logging_config
 
 
 import logging
@@ -28,7 +28,7 @@ class Logger:
                 TimezoneFormatter(
                     fmt="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
                     datefmt="%Y-%m-%d %H:%M:%S",
-                    timezone=config.TIMEZONE,
+                    timezone=app_config.TIMEZONE,
                 )
             )
 
@@ -38,15 +38,11 @@ class Logger:
         """Log an informational message."""
         self.logger.info(msg, *args, **kwargs)
 
-    def log_error(self, msg, err, *args, **kwargs):
+    def log_error(self, msg, *args, **kwargs):
         """
         Log an error message.
 
         Args:
             msg (str): The error message.
-            err (Exception): Optional. The exception object associated with the error.
         """
-        if err:
-            self.logger.error(f"{msg}: {err}", *args, **kwargs)
-        else:
-            self.logger.error(msg, *args, **kwargs)
+        self.logger.error(msg, *args, **kwargs)
