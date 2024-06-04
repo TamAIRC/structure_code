@@ -9,7 +9,7 @@ from abc import ABC, abstractmethod
 from logger.logger import Logger
 from patterns.singleton_meta import SingletonABCMeta
 
-class BaseConnect(ABC, metaclass=SingletonABCMeta):
+class BaseConnection(ABC, metaclass=SingletonABCMeta):
     def __init__(self, database_name, **kwargs):
         self.client = None
         self.database = None

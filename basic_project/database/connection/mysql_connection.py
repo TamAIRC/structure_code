@@ -1,4 +1,4 @@
-# mysql_connect.py
+# mysql_connection.py
 import os
 import sys
 
@@ -7,14 +7,14 @@ project_root = os.path.abspath(os.path.join(current_dir, "../../"))
 sys.path.append(project_root)
 
 from configs.db_config import CONNECT
-from patterns.base_connect import Connect
+from basic_project.patterns.base_connection import Connect
 from logger.logger import Logger
 
 import mysql.connector
 from mysql.connector import Error
 
 
-class MySQLConnect(Connect):
+class MySQLConnection(Connect):
     def __init__(self, database_name):
         super().__init__(database_name)
         self._connect()
@@ -28,12 +28,12 @@ class MySQLConnect(Connect):
                 password=CONNECT["mysql"]["PASSWORD"],
             )
             self._test_connection()
-            Logger("MySQLConnect").log_info("Connected to MySQL")
+            Logger("MySQLConnection").log_info("Connected to MySQL")
         except Error as e:
-            Logger("MySQLConnect").log_error("MySQL connection failure", e)
+            Logger("MySQLConnection").log_error("MySQL connection failure", e)
             self.client = None
         except Exception as e:
-            Logger("MySQLConnect").log_error("An error occurred while connecting to MySQL", e)
+            Logger("MySQLConnection").log_error("An error occurred while connecting to MySQL", e)
             self.client = None
 
     def _test_connection(self):
@@ -42,14 +42,14 @@ class MySQLConnect(Connect):
                 cursor = self.client.cursor()
                 cursor.execute("SELECT 1")
                 cursor.close()
-                Logger("MySQLConnect").log_info("MySQL connection test passed")
+                Logger("MySQLConnection").log_info("MySQL connection test passed")
         except Error as e:
-            Logger("MySQLConnect").log_error("MySQL connection test failed", e)
+            Logger("MySQLConnection").log_error("MySQL connection test failed", e)
             self.client = None
 
     def get_collection(self, table_name):
         if self.client is None:
-            Logger("MySQLConnect").log_error("No database connection available", "")
+            Logger("MySQLConnection").log_error("No database connection available", "")
             return None
 
         try:
@@ -57,20 +57,20 @@ class MySQLConnect(Connect):
             cursor.execute(f"SELECT * FROM {table_name}")
             result = cursor.fetchall()
             cursor.close()
-            Logger("MySQLConnect").log_info(f"Accessed table: {table_name}")
+            Logger("MySQLConnection").log_info(f"Accessed table: {table_name}")
             return result
         except Error as e:
-            Logger("MySQLConnect").log_error(f"Failed to access table: {table_name}", e)
+            Logger("MySQLConnection").log_error(f"Failed to access table: {table_name}", e)
             return None
 
     def close_connection(self):
         if self.client:
             try:
                 self.client.close()
-                Logger("MySQLConnect").log_info("MySQL connection closed")
+                Logger("MySQLConnection").log_info("MySQL connection closed")
             except Error as e:
-                Logger("MySQLConnect").log_error(
+                Logger("MySQLConnection").log_error(
                     "Error occurred while closing MySQL connection", e
                 )
         else:
-            Logger("MySQLConnect").log_info("No active MySQL connection to close")
+            Logger("MySQLConnection").log_info("No active MySQL connection to close")

@@ -1,11 +1,11 @@
-# postgresql_connect.py
+# postgresql_connection.py
 import psycopg2
 from configs.db_config import CONNECT
-from patterns.base_connect import Connect
+from basic_project.patterns.base_connection import Connect
 from logger.logger import Logger
 
 
-class PostgreSQLConnect(Connect):
+class PostgreSQLConnection(Connect):
     def __init__(self, database_name):
         super().__init__(database_name)
         self._connect()
@@ -19,12 +19,12 @@ class PostgreSQLConnect(Connect):
                 password=CONNECT["postgresql"]["PASSWORD"],
             )
             self._test_connection()
-            Logger("PostgreSQLConnect").log_info("Connected to PostgreSQL")
+            Logger("PostgreSQLConnection").log_info("Connected to PostgreSQL")
         except psycopg2.OperationalError as e:
-            Logger("PostgreSQLConnect").log_error("PostgreSQL connection failure", e)
+            Logger("PostgreSQLConnection").log_error("PostgreSQL connection failure", e)
             self.client = None
         except Exception as e:
-            Logger("PostgreSQLConnect").log_error("An error occurred while connecting to PostgreSQL", e)
+            Logger("PostgreSQLConnection").log_error("An error occurred while connecting to PostgreSQL", e)
             self.client = None
 
     def _test_connection(self):
@@ -33,14 +33,14 @@ class PostgreSQLConnect(Connect):
                 cursor = self.client.cursor()
                 cursor.execute("SELECT 1")
                 cursor.close()
-                Logger("PostgreSQLConnect").log_info("PostgreSQL connection test passed")
+                Logger("PostgreSQLConnection").log_info("PostgreSQL connection test passed")
         except psycopg2.OperationalError as e:
-            Logger("PostgreSQLConnect").log_error("PostgreSQL connection test failed", e)
+            Logger("PostgreSQLConnection").log_error("PostgreSQL connection test failed", e)
             self.client = None
 
     def get_collection(self, table_name):
         if self.client is None:
-            Logger("PostgreSQLConnect").log_error("No database connection available", "")
+            Logger("PostgreSQLConnection").log_error("No database connection available", "")
             return None
 
         try:
@@ -48,20 +48,20 @@ class PostgreSQLConnect(Connect):
             cursor.execute(f"SELECT * FROM {table_name}")
             result = cursor.fetchall()
             cursor.close()
-            Logger("PostgreSQLConnect").log_info(f"Accessed table: {table_name}")
+            Logger("PostgreSQLConnection").log_info(f"Accessed table: {table_name}")
             return result
         except psycopg2.OperationalError as e:
-            Logger("PostgreSQLConnect").log_error(f"Failed to access table: {table_name}", e)
+            Logger("PostgreSQLConnection").log_error(f"Failed to access table: {table_name}", e)
             return None
 
     def close_connection(self):
         if self.client:
             try:
                 self.client.close()
-                Logger("PostgreSQLConnect").log_info("PostgreSQL connection closed")
+                Logger("PostgreSQLConnection").log_info("PostgreSQL connection closed")
             except psycopg2.OperationalError as e:
-                Logger("PostgreSQLConnect").log_error(
+                Logger("PostgreSQLConnection").log_error(
                     "Error occurred while closing PostgreSQL connection", e
                 )
         else:
-            Logger("PostgreSQLConnect").log_info("No active PostgreSQL connection to close")
+            Logger("PostgreSQLConnection").log_info("No active PostgreSQL connection to close")
