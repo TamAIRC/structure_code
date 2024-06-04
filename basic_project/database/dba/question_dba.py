@@ -14,9 +14,8 @@ from utils.util import (
     prepare_bulk_updates,
     validate_condition,
 )
-from utils.json_encoder import convert_objectid_to_str
 
-
+from pymongo.errors import PyMongoError
 from bson import ObjectId
 from typing import Any, Dict, List
 
@@ -53,7 +52,8 @@ class QuestionDBA(MongoDBA):
         try:
             validated_condition = validate_condition(condition)
             cursor = self.collection.find(validated_condition, session=session).limit(n)
-            return [Question(**data) for data in cursor]
+            return [Question.from_json_obj(data) for data in cursor]
+            # return cursor
         except ValueError as e:
             print(e)
             return None
@@ -100,20 +100,22 @@ class QuestionDBA(MongoDBA):
             print(e)
             return False
 
-    def get_questions(self, N, session=None):
-        questions = self.find_many(N, {}, session=session)
-        if questions is None:
+    def get_questions(self, n: int, session=None) -> List[Question]:
+        try:
+            questions = self.find_many(n, {}, session=session)
+            if questions is None:
+                return []
+            return questions
+        except PyMongoError as e:
+            print(f"Error getting questions: {e}")
             return []
-        questions_serializable = [
-            convert_objectid_to_str(question) for question in questions
-        ]
-        return questions_serializable
 
 
 if __name__ == "__main__":
     # Example usage
     question_dba = QuestionDBA()
-
+    data = question_dba.transaction(question_dba.get_questions, n=5)
+    print(data)
     # Insert a new question
     # new_question = Question(
     #     id=ObjectId(),

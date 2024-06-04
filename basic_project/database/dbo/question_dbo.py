@@ -1,7 +1,7 @@
 import os
 import sys
 from bson import ObjectId
-from pydantic import Field
+from pydantic import ConfigDict, Field
 from typing import Any, Dict, List, Union
 
 
@@ -25,10 +25,11 @@ class QuestionDBO(BaseDBO):
     language: int
     multimedia: ObjectId
 
-    class Config:
-        arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
-        populate_by_name = True
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+    # class Config:
+    #     arbitrary_types_allowed = True
+    #     json_encoders = {ObjectId: str}
+    #     populate_by_name = True
 
     def validate(self):
         pass
