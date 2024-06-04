@@ -10,6 +10,9 @@ from configs import app_config, logging_config
 
 import logging
 
+FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+DATAFMT = "%Y-%m-%d %H:%M:%S"
+
 
 class Logger:
     def __init__(self, name="Logger"):
@@ -17,8 +20,8 @@ class Logger:
         logging.basicConfig(
             filename=logging_config.LOGGER_FILE,
             level=logging.DEBUG,
-            format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-            datefmt="%Y-%m-%d %H:%M:%S",
+            format=FORMAT,
+            datefmt=DATAFMT,
         )
 
         # Update the root logger to use the timezone-aware formatter
@@ -26,8 +29,8 @@ class Logger:
         for handler in logger.handlers:
             handler.setFormatter(
                 TimezoneFormatter(
-                    fmt="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-                    datefmt="%Y-%m-%d %H:%M:%S",
+                    fmt=FORMAT,
+                    datefmt=DATAFMT,
                     timezone=app_config.TIMEZONE,
                 )
             )

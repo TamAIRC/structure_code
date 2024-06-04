@@ -1,4 +1,4 @@
-# singleton.py
+# singleton_meta.py
 from abc import ABCMeta
 
 
@@ -14,6 +14,10 @@ class SingletonMeta(type):
             instance = super().__call__(*args, **kwargs)
             cls._instances[cls] = instance
         return cls._instances[cls]
+
+    def _remove_instance(cls):
+        if cls in cls._instances:
+            del cls._instances[cls]
 
 
 class SingletonABCMeta(SingletonMeta, ABCMeta):
