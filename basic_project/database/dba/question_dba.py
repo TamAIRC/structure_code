@@ -119,41 +119,60 @@ class QuestionDBA(MongoDBA):
 
 if __name__ == "__main__":
     # Example usage
+    # Get question
     question_dba = QuestionDBA()
     data = question_dba.transaction(question_dba.get_questions, n=2)
     print(data)
-    new_questions_data = [
-        {
-            "_id": "66260e94a51b34b732f211dd",
-            "category": "History",
-            "subcategory": "Vietnam History",
-            "content": "What is the capital of Vietnam?",
-            "answers": ["Hanoi", "Ninh Binh", "Thai Nguyen", "Da Nang"],
-            "correct_answer": "Hanoi",
-            "difficulty": 1,
-            "required_rank": 1,
-            "language": 1,
-            "multimedia": "66260e86a51b34b732f21182"
-        }, 
-        {
-            "_id": "66260e94a51b34b732f211de",
-            "category": "History",
-            "subcategory": "World History",
-            "content": "What is the capital of France?",
-            "answers": ["Paris", "London", "Barcelona", "Madrid"],
-            "correct_answer": "Paris",
-            "difficulty": 1,
-            "required_rank": 1,
-            "language": 1,
-            "multimedia": "66260e88a51b34b732f2118e"
-        }, 
-    ]
 
-    questions_dbo = [Question.from_json_obj(data) for data in new_questions_data]
-    updated_status = question_dba.transaction(question_dba.update_questions, questions=questions_dbo)
-    data = question_dba.transaction(question_dba.get_questions, n=2)
+    # Update question
+    # new_questions_data = [
+    #     {
+    #         "_id": "66260e94a51b34b732f211dd",
+    #         "category": "History",
+    #         "subcategory": "Vietnam History",
+    #         "content": "What is the capital of Vietnam?",
+    #         "answers": ["Hanoi", "Ninh Binh", "Thai Nguyen", "Da Nang"],
+    #         "correct_answer": "Hanoi",
+    #         "difficulty": 1,
+    #         "required_rank": 1,
+    #         "language": 1,
+    #         "multimedia": "66260e86a51b34b732f21182"
+    #     }, 
+    #     {
+    #         "_id": "66260e94a51b34b732f211de",
+    #         "category": "History",
+    #         "subcategory": "World History",
+    #         "content": "What is the capital of France?",
+    #         "answers": ["Paris", "London", "Barcelona", "Madrid"],
+    #         "correct_answer": "Paris",
+    #         "difficulty": 1,
+    #         "required_rank": 1,
+    #         "language": 1,
+    #         "multimedia": "66260e88a51b34b732f2118e"
+    #     }, 
+    # ]
 
-    print(data)
+    # questions_dbo = [Question.from_json_obj(data) for data in new_questions_data]
+    # updated_status = question_dba.transaction(question_dba.update_questions, questions=questions_dbo)
+    # data = question_dba.transaction(question_dba.get_questions, n=2)
+    # print(data)
+
+    # Add question
+    # new_data = {
+    #     "_id": "66260e94a51b34b732f211de",
+    #     "category": "History",
+    #     "subcategory": "World History",
+    #     "content": "What is the capital of France?",
+    #     "answers": ["Paris", "London", "Barcelona", "Madrid"],
+    #     "correct_answer": "Paris",
+    #     "difficulty": 1,
+    #     "required_rank": 1,
+    #     "language": 1,
+    #     "multimedia": "66260e88a51b34b732f2118e"
+    # } 
+
+
+
     # Insert a new question
     # new_question = Question(
     #     id=ObjectId(),
