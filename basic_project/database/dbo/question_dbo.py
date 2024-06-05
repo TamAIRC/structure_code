@@ -26,13 +26,15 @@ class QuestionDBO(BaseDBO):
     multimedia: ObjectId
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
-    # class Config:
-    #     arbitrary_types_allowed = True
-    #     json_encoders = {ObjectId: str}
-    #     populate_by_name = True
 
     def validate(self):
         pass
+
+    def get_id(self):
+        return self.id
+
+    def set_id(self, new_id: ObjectId):
+        self.id = new_id
 
     @classmethod
     def from_json_obj(cls, json_obj: Dict[str, Any]):

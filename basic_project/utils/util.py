@@ -1,5 +1,7 @@
 import json
+from typing import Any, Dict, List
 from bson.objectid import ObjectId
+from pymongo import UpdateOne
 
 
 def validate_input(data):
@@ -55,36 +57,28 @@ def validate_condition(condition):
         raise ValueError("Condition must be a dictionary")
     return condition
 
-
-def prepare_bulk_updates(ids, new_values):
+def prepare_bulk_updates(ids: List[ObjectId], new_values: List[Dict[str, Any]]):
     """
-    Prepare a list of bulk update operations.
+    #     Prepare a list of bulk update operations.
 
-    Parameters:
-    - ids: list of str or ObjectId
-    - new_values: list of dict
+    #     Parameters:
+    #     - ids: list of str or ObjectId
+    #     - new_values: list of dict
 
-    Returns:
-    - list of dict
-    """
+    #     Returns:
+    #     - list of dict
+    #     """
     if len(ids) != len(new_values):
         raise ValueError("The length of ids and new_values must match")
-
     bulk_updates = []
-    for id, new_value in zip(ids, new_values):
-        try:
-            normalized_id = normalize_id(id)
-            bulk_updates.append(
-                {
-                    "updateOne": {
-                        "filter": {"_id": normalized_id},
-                        "update": {"$set": new_value},
-                    }
-                }
-            )
+    for _id, values in zip(ids, new_values):
+        try: 
+            normalized_id = normalize_id(_id)
+            # Ensure _id is not included in the update part
+            update_values = {k: v for k, v in values.items() if k != '_id'}
+            bulk_updates.append(UpdateOne({'_id': normalized_id}, {'$set': update_values}))
         except ValueError as e:
             raise ValueError(f"Error processing ID {id}: {e}") from e
-
     return bulk_updates
 
 
