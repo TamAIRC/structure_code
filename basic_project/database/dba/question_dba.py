@@ -72,12 +72,24 @@ class QuestionDBA(MongoDBA):
             return False
 
     def update_many_by_id(
-        self, ids: List[ObjectId], new_values: List[Dict[str, Any]], session=None
-    ) -> bool:
+            self, ids: List[ObjectId], new_values: List[Dict[str, Any]], session=None
+        ) -> bool:
         try:
-            bulk_updates = prepare_bulk_updates(ids, new_values)
-            result = self.collection.bulk_write(bulk_updates, session=session)
-            return result.modified_count > 0
+            if len(ids) != len(new_values):
+                raise ValueError("The length of ids and new_values must be the same.")
+            
+            normalized_ids = [normalize_id(id) for id in ids]
+            modified_count = 0
+
+            for normalized_id, new_value in zip(normalized_ids, new_values):
+                result = self.collection.update_one(
+                    {"_id": normalized_id},
+                    {"$set": new_value},
+                    session=session
+                )
+                modified_count += result.modified_count
+            
+            return modified_count > 0
         except ValueError as e:
             print(e)
             return False

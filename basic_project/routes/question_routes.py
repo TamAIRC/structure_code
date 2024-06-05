@@ -9,13 +9,19 @@ sys.path.append(project_root)
 
 from controllers.get_question_controller import GetQuestionController
 from controllers.update_question_controller import UpdateQuestionController
-from utils.util import validate_input
+from utils.util import validate_input, validate_positive_number
 router = APIRouter()
 @router.get("/questions")
-async def get_questions(N: int = Query(100, description="Number of questions to retrieve")):
+async def get_questions(N: int = Query(description="Number of questions to retrieve")):
     try:
+        print("N",N)
+        if validate_positive_number(N) == False:
+            error_input = {
+                "status": False,
+                "message": "Input must be a positive number"
+            }
+            return error_input
         question_controller = GetQuestionController()
-        # Fetch questions from the controller
         successed, questions = await question_controller.get_n_questions(N) 
         if successed:
             result = {
