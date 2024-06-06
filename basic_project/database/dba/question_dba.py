@@ -84,9 +84,18 @@ class QuestionDBA(MongoDBA):
 
     def insert(self, obj: Question, session=None) -> ObjectId:
         try:
-            data = obj.to_json()
+            data = obj.model_dump(by_alias=True)
             result = self.collection.insert_one(data, session=session)
             return result.inserted_id
+        except ValueError as e:
+            print(e)
+            return None
+        
+    def insert_many(self, objs: List[Question], session=None) -> List[ObjectId]:
+        try:
+            data = [obj.model_dump(by_alias=True) for obj in objs]
+            result = self.collection.insert_many(data, session=session)
+            return result.inserted_ids
         except ValueError as e:
             print(e)
             return None
@@ -111,19 +120,22 @@ class QuestionDBA(MongoDBA):
             return []
 
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
     # Example usage
-    question_dba = QuestionDBA()
-    data = question_dba.transaction(question_dba.get_questions, n=5)
-    print(data)
+    # question_dba = QuestionDBA()
+    # data = question_dba.transaction(question_dba.get_questions, n=5)
+    # print(data)
     # Insert a new question
     # new_question = Question(
-    #     id=ObjectId(),
+    #     # _id='60f1b9b3b3b3b3b3b3b3b3b3',
     #     category=1,
     #     subcategory="Math",
     #     content="What is 2+2?",
     #     answers=["2", "3", "4", "5"],
     #     correct_answer="4",
+    #     required_rank=1,
+    #     language=1,
+    #     difficulty=1,
     #     multimedia=ObjectId(),
     # )
     # def sample_transaction(session):
