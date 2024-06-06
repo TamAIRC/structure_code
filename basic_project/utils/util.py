@@ -16,6 +16,11 @@ def validate_input(data):
     except (ValueError, json.JSONDecodeError) as e:
         raise ValueError(f"Error validating input: {data}") from e
 
+def validate_positive_number(number):
+    print("number", number)
+    if number < 0:
+        return False
+    return True
 
 def toString(id):
     """Convert an ObjectId to  a string"""
