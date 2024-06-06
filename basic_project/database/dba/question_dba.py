@@ -59,18 +59,18 @@ class QuestionDBA(MongoDBA):
             print(e)
             return None
 
-    # def update_one_by_id(
-    #     self, id: ObjectId, new_value: Dict[str, Any], session=None
-    # ) -> bool:
-    #     try:
-    #         normalized_id = normalize_id(id)
-    #         result = self.collection.update_one(
-    #             {"_id": normalized_id}, {"$set": new_value}, session=session
-    #         )
-    #         return result.modified_count > 0
-    #     except ValueError as e:
-    #         print(e)
-    #         return False
+    def update_one_by_id(
+        self, id: ObjectId, new_value: Dict[str, Any], session=None
+    ) -> bool:
+        try:
+            normalized_id = normalize_id(id)
+            result = self.collection.update_one(
+                {"_id": normalized_id}, {"$set": new_value}, session=session
+            )
+            return result.modified_count > 0
+        except ValueError as e:
+            print(e)
+            return False
 
     def update_many_by_id(
         self, ids: List[ObjectId], new_values: List[Dict[str, Any]], session=None
@@ -92,14 +92,14 @@ class QuestionDBA(MongoDBA):
             print(e)
             return None
 
-    # def delete_by_id(self, id: ObjectId, session=None) -> bool:
-    #     try:
-    #         normalized_id = normalize_id(id)
-    #         result = self.collection.delete_one({"_id": normalized_id}, session=session)
-    #         return result.deleted_count > 0
-    #     except ValueError as e:
-    #         print(e)
-    #         return False
+    def delete_by_id(self, id: ObjectId, session=None) -> bool:
+        try:
+            normalized_id = normalize_id(id)
+            result = self.collection.delete_one({"_id": normalized_id}, session=session)
+            return result.deleted_count > 0
+        except ValueError as e:
+            print(e)
+            return False
 
     def get_questions(self, n: int, session=None) -> List[Question]:
         try:

@@ -10,9 +10,10 @@ def validate_input(data):
         # Ensure data is a dictionary and has an 'input' key
         if not isinstance(data, dict):
             data = json.loads(data)
-        if "input" not in data:
-            raise ValueError("The JSON object must contain an 'input' key")
-        return data["input"]
+        # if "input" not in data:
+        #     raise ValueError("The JSON object must contain an 'input' key")
+        # return data["input"]
+        return data
     except (ValueError, json.JSONDecodeError) as e:
         raise ValueError(f"Error validating input: {data}") from e
 
