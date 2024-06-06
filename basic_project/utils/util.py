@@ -1,7 +1,7 @@
 import json
 from typing import Any, Dict, List
 from bson.objectid import ObjectId
-from pymongo import UpdateOne
+from pymongo import UpdateOne, DeleteOne
 
 
 def validate_input(data):
@@ -80,6 +80,26 @@ def prepare_bulk_updates(ids: List[ObjectId], new_values: List[Dict[str, Any]]):
         except ValueError as e:
             raise ValueError(f"Error processing ID {id}: {e}") from e
     return bulk_updates
+
+def prepare_bulk_deletes(ids):
+    """
+    Prepare a list of bulk delete operations.
+
+    Parameters:
+    - ids: list of str or ObjectId
+
+    Returns:
+    - list of DeleteOne operations
+    """
+    bulk_deletes = []
+    for id in ids:
+        try:
+            normalized_id = normalize_id(id)
+            bulk_deletes.append(DeleteOne({'_id': normalized_id}))
+        except ValueError as e:
+            raise ValueError(f"Error processing ID {id}: {e}") from e
+
+    return bulk_deletes
 
 
 def serialize_object_id(data):

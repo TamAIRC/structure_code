@@ -11,6 +11,7 @@ from database.dba.mongo_dba import MongoDBA
 from configs import db_config
 from utils.util import (
     normalize_id,
+    prepare_bulk_deletes,
     prepare_bulk_updates,
     validate_condition,
 )
@@ -58,18 +59,18 @@ class QuestionDBA(MongoDBA):
             print(e)
             return None
 
-    def update_one_by_id(
-        self, id: ObjectId, new_value: Dict[str, Any], session=None
-    ) -> bool:
-        try:
-            normalized_id = normalize_id(id)
-            result = self.collection.update_one(
-                {"_id": normalized_id}, {"$set": new_value}, session=session
-            )
-            return result.modified_count > 0
-        except ValueError as e:
-            print(e)
-            return False
+    # def update_one_by_id(
+    #     self, id: ObjectId, new_value: Dict[str, Any], session=None
+    # ) -> bool:
+    #     try:
+    #         normalized_id = normalize_id(id)
+    #         result = self.collection.update_one(
+    #             {"_id": normalized_id}, {"$set": new_value}, session=session
+    #         )
+    #         return result.modified_count > 0
+    #     except ValueError as e:
+    #         print(e)
+    #         return False
 
     def update_many_by_id(
         self, ids: List[ObjectId], new_values: List[Dict[str, Any]], session=None
@@ -91,14 +92,14 @@ class QuestionDBA(MongoDBA):
             print(e)
             return None
 
-    def delete_by_id(self, id: ObjectId, session=None) -> bool:
-        try:
-            normalized_id = normalize_id(id)
-            result = self.collection.delete_one({"_id": normalized_id}, session=session)
-            return result.deleted_count > 0
-        except ValueError as e:
-            print(e)
-            return False
+    # def delete_by_id(self, id: ObjectId, session=None) -> bool:
+    #     try:
+    #         normalized_id = normalize_id(id)
+    #         result = self.collection.delete_one({"_id": normalized_id}, session=session)
+    #         return result.deleted_count > 0
+    #     except ValueError as e:
+    #         print(e)
+    #         return False
 
     def get_questions(self, n: int, session=None) -> List[Question]:
         try:
@@ -116,13 +117,22 @@ class QuestionDBA(MongoDBA):
         if updated_question is None:
             return None
         return updated_question
+    
+    def delete_questions(self, ids: List[ObjectId], session=None):
+        try:
+            bulk_deletes = prepare_bulk_deletes(ids)
+            result = self.collection.bulk_write(bulk_deletes, session=session)
+            return result.deleted_count
+        except ValueError as e:
+            print(e)
+            return None
 
 if __name__ == "__main__":
     # Example usage
     # Get question
     question_dba = QuestionDBA()
-    data = question_dba.transaction(question_dba.get_questions, n=2)
-    print(data)
+    # data = question_dba.transaction(question_dba.get_questions, n=2)
+    # print(data)
 
     # Update question
     # new_questions_data = [
@@ -157,21 +167,12 @@ if __name__ == "__main__":
     # data = question_dba.transaction(question_dba.get_questions, n=2)
     # print(data)
 
-    # Add question
-    # new_data = {
-    #     "_id": "66260e94a51b34b732f211de",
-    #     "category": "History",
-    #     "subcategory": "World History",
-    #     "content": "What is the capital of France?",
-    #     "answers": ["Paris", "London", "Barcelona", "Madrid"],
-    #     "correct_answer": "Paris",
-    #     "difficulty": 1,
-    #     "required_rank": 1,
-    #     "language": 1,
-    #     "multimedia": "66260e88a51b34b732f2118e"
-    # } 
-
-
+    # Delete questions
+    delete_data = ["66260e94a51b34b732f211df", "66260e94a51b34b732f211e0"]
+    delete_data_obj = [normalize_id(data) for data in delete_data]
+    print(delete_data_obj)
+    deleted_status = question_dba.transaction(question_dba.delete_questions, ids=delete_data)
+    print("Deleted status: ", deleted_status)
 
     # Insert a new question
     # new_question = Question(
