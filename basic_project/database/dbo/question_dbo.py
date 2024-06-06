@@ -1,8 +1,8 @@
 import os
 import sys
 from bson import ObjectId
-from pydantic import ConfigDict, Field
-from typing import Any, Dict, List, Union
+from pydantic import ConfigDict, Field, field_validator, field_serializer
+from typing import Any, Dict, List, Union, Optional
 
 
 current_dir = os.path.dirname(__file__)
@@ -14,7 +14,7 @@ from utils import util
 
 
 class QuestionDBO(BaseDBO):
-    id: ObjectId = Field(default_factory=ObjectId, alias="_id")
+    id: Optional[ObjectId] = Field(default=None, alias="_id")
     category: Union[int, str]
     subcategory: str
     content: str
@@ -24,12 +24,23 @@ class QuestionDBO(BaseDBO):
     required_rank: int
     language: int
     multimedia: ObjectId
-
-    model_config = ConfigDict(arbitrary_types_allowed=True)
-    # class Config:
-    #     arbitrary_types_allowed = True
-    #     json_encoders = {ObjectId: str}
-    #     populate_by_name = True
+    
+    class Config:
+        arbitrary_types_allowed = True
+        validate_assignment = True # Cho phép xác thực khi gán giá trị
+        # json_encoders = {ObjectId: str}
+        # populate_by_name = True
+    
+    # Chuyển đổi thành ObjectId nếu đầu vào là string trước khi validate
+    @field_validator("id", "multimedia", mode="before")
+    def convert_to_object_id(cls, value):
+        if isinstance(value, str):
+            return ObjectId(value)
+        return value
+    
+    @field_serializer('id', 'multimedia')
+    def serialize_dt(self, id: ObjectId, _info):
+        return str(id)
 
     def validate(self):
         pass
@@ -37,8 +48,8 @@ class QuestionDBO(BaseDBO):
     @classmethod
     def from_json_obj(cls, json_obj: Dict[str, Any]):
         """Convert JSON object to data format."""
-        json_obj["_id"] = ObjectId(json_obj["_id"])
-        json_obj["multimedia"] = ObjectId(json_obj["multimedia"])
+        # json_obj["_id"] = ObjectId(json_obj["_id"])
+        # json_obj["multimedia"] = ObjectId(json_obj["multimedia"])
         return cls(**json_obj)
 
     @classmethod
@@ -61,14 +72,13 @@ class QuestionDBO(BaseDBO):
                 setattr(b, attr, value)
 
     def to_json(self) -> Dict[str, Any]:
-        data = self.model_dump(by_alias=True)
-        data["_id"] = util.toString(data["_id"])
-        data["multimedia"] = util.toString(data["multimedia"])
-        return data
+        """Convert the Question object to a JSON object."""
+        return self.model_dump_json(by_alias=True)
 
-    def to_string(self) -> str:
-        """Convert the Question object to a string representation."""
-        return str(self.model_dump(by_alias=True))
+    # Hàm này bỏ đi nó có sẵn r mà :vvvvv
+    # def to_string(self) -> str:
+    #     """Convert the Question object to a string representation."""
+    #     return str(self.model_dump(by_alias=True))
 
 
 if __name__ == "__main__":
