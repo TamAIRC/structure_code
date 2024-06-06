@@ -28,6 +28,9 @@ class QuestionDBO(BaseDBO):
     class Config:
         arbitrary_types_allowed = True
         validate_assignment = True # Cho phép xác thực khi gán giá trị
+        json_encoders = {
+            ObjectId: str  # Ensures ObjectId fields are serialized as strings
+        }
         # json_encoders = {ObjectId: str}
         # populate_by_name = True
     
@@ -38,9 +41,9 @@ class QuestionDBO(BaseDBO):
             return ObjectId(value)
         return value
     
-    @field_serializer('id', 'multimedia')
-    def serialize_dt(self, id: ObjectId, _info):
-        return str(id)
+    # @field_serializer('id', 'multimedia')
+    # def serialize_id(self, id: ObjectId, _info):
+    #     return str(id)
 
     def validate(self):
         pass
