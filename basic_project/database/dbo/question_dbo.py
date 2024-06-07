@@ -39,6 +39,12 @@ class QuestionDBO(BaseDBO):
     def validate(self):
         pass
 
+    def get_id(self):
+        return self.id
+
+    def set_id(self, new_id: ObjectId):
+        self.id = new_id
+
     @classmethod
     def from_json_obj(cls, json_obj: Dict[str, Any]):
         """Convert JSON object to data format."""
