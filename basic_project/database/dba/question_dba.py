@@ -13,6 +13,7 @@ from utils.util import (
     normalize_id,
     prepare_bulk_updates,
     validate_condition,
+    validate_multimedia,
 )
 
 from pymongo.errors import PyMongoError
@@ -84,9 +85,21 @@ class QuestionDBA(MongoDBA):
 
     def insert(self, obj: Question, session=None) -> ObjectId:
         try:
-            data = obj.to_json()
+            # validate_multimedia(obj.multimedia)
+            data = obj.model_dump(exclude_defaults=True)
+            print(data)
             result = self.collection.insert_one(data, session=session)
             return result.inserted_id
+        except ValueError as e:
+            print(e)
+            return None
+        
+    def insert_many(self, objs: List[Question], session=None) -> List[ObjectId]:
+        try:
+            # validate_multimedia([obj.multimedia for obj in objs])
+            data = [obj.model_dump(exclude_defaults=True) for obj in objs]
+            result = self.collection.insert_many(data, session=session)
+            return result.inserted_ids
         except ValueError as e:
             print(e)
             return None
@@ -114,18 +127,24 @@ class QuestionDBA(MongoDBA):
 if __name__ == "__main__":
     # Example usage
     question_dba = QuestionDBA()
-    data = question_dba.transaction(question_dba.get_questions, n=5)
-    print(data)
+    # data = question_dba.transaction(question_dba.get_questions, n=5)
+    # print(data)
     # Insert a new question
-    # new_question = Question(
-    #     id=ObjectId(),
-    #     category=1,
-    #     subcategory="Math",
-    #     content="What is 2+2?",
-    #     answers=["2", "3", "4", "5"],
-    #     correct_answer="4",
-    #     multimedia=ObjectId(),
-    # )
+    new_question = Question(
+        category=1,
+        subcategory="Math",
+        content="What is 2+2?",
+        answers=["2", "3", "4", "5"],
+        correct_answer="4",
+        required_rank=1,
+        language=1,
+        difficulty=1,
+        multimedia=ObjectId(),
+    )
+    
+    # inserted_id = question_dba.transaction(question_dba.insert, obj=new_question)
+    inserted_id = question_dba.insert(new_question)
+    print(f"Inserted question with ID: {inserted_id}")
     # def sample_transaction(session):
     #     # Insert a new question within the transaction
     #     new_question = Question(
