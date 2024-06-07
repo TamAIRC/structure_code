@@ -168,11 +168,11 @@ if __name__ == "__main__":
     # print(data)
 
     # Delete questions
-    delete_data = ["66260e94a51b34b732f211df", "66260e94a51b34b732f211e0"]
-    delete_data_obj = [normalize_id(data) for data in delete_data]
-    print(delete_data_obj)
-    deleted_status = question_dba.transaction(question_dba.delete_questions, ids=delete_data)
-    print("Deleted status: ", deleted_status)
+    # delete_data = ["66260e94a51b34b732f211df", "66260e94a51b34b732f211e0"]
+    # delete_data_obj = [normalize_id(data) for data in delete_data]
+    # print(delete_data_obj)
+    # deleted_status = question_dba.transaction(question_dba.delete_questions, ids=delete_data)
+    # print("Deleted status: ", deleted_status)
 
     # Insert a new question
     # new_question = Question(
