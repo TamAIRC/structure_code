@@ -1,1 +1,0 @@
-# patterns/base_object.py
