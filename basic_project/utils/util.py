@@ -171,10 +171,6 @@ def build_projection(fields):
     """
     return {field: 1 for field in fields}
 
-def validate_multimedia(id):
-    # TODO: Ensure the multimedia ID exists in the database.
-    return True
-
 
 if __name__ == "__main__":
     # Example usage of the utils functions
