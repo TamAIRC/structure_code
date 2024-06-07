@@ -3,16 +3,21 @@ from bson.objectid import ObjectId
 
 
 def validate_input(data):
-    """Validate that the input is a JSON object with an 'input' key."""
+    """Validate that the input is a JSON object."""
     try:
         # Ensure data is a dictionary and has an 'input' key
         if not isinstance(data, dict):
             data = json.loads(data)
-        if "input" not in data:
-            raise ValueError("The JSON object must contain an 'input' key")
-        return data["input"]
+        return data
     except (ValueError, json.JSONDecodeError) as e:
         raise ValueError(f"Error validating input: {data}") from e
+
+
+def validate_positive_number(number):
+    print("number", number)
+    if number < 0:
+        return False
+    return True
 
 
 def toString(id):

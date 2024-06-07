@@ -19,11 +19,13 @@ from pymongo.errors import ServerSelectionTimeoutError, ConnectionFailure, PyMon
 
 class MongoDBA(BaseDBA):
     def __init__(self, collection_name):
-        self.connection = MongoConnection(CONNECT["mongo"]["DATABASE"])
-        self.collection = self.connection.get_collection(collection_name)
+        self.collection_name = collection_name
+        self.collection = None
 
     def transaction(self, query_func, **kwargs):
         """Perform a transaction. Implementation depends on specific use case."""
+        self.connection = MongoConnection(CONNECT["mongo"]["DATABASE"])
+        self.collection = self.connection.get_collection(self.collection_name)
         if self.connection is None:
             Logger("MongoDBA").log_error("No MongoDB client available for transaction")
             return None
