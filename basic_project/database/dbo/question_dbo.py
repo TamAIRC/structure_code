@@ -2,7 +2,7 @@ import os
 import sys
 from bson import ObjectId
 from pydantic import ConfigDict, Field, field_validator
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Union, Optional
 
 
 current_dir = os.path.dirname(__file__)
@@ -10,11 +10,10 @@ project_root = os.path.abspath(os.path.join(current_dir, "../../"))
 sys.path.append(project_root)
 
 from patterns.base_dbo import BaseDBO
-from utils import util
 
 
 class QuestionDBO(BaseDBO):
-    id: ObjectId = Field(default_factory=ObjectId, alias="_id")
+    id: Optional[ObjectId] = Field(default=None, alias="_id")
     category: Union[int, str]
     subcategory: str
     content: str
@@ -23,9 +22,19 @@ class QuestionDBO(BaseDBO):
     difficulty: int
     required_rank: int
     language: int
-    multimedia: ObjectId
+    multimedia: Optional[ObjectId] = Field(default=None)
 
-    model_config = ConfigDict(arbitrary_types_allowed=True)
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True,
+        validate_assignment=True,
+    )
+
+    # Chuyển đổi thành ObjectId nếu đầu vào là string trước khi validate
+    @field_validator("id", "multimedia", mode="before")
+    def convert_to_object_id(cls, value):
+        if isinstance(value, str):
+            return ObjectId(value)
+        return value
 
     # Chuyển đổi thành ObjectId nếu đầu vào là string trước khi validate
     @field_validator("id", "multimedia", mode="before")
@@ -46,8 +55,6 @@ class QuestionDBO(BaseDBO):
     @classmethod
     def from_json_obj(cls, json_obj: Dict[str, Any]):
         """Convert JSON object to data format."""
-        json_obj["_id"] = ObjectId(json_obj["_id"])
-        json_obj["multimedia"] = ObjectId(json_obj["multimedia"])
         return cls(**json_obj)
 
     @classmethod

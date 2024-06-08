@@ -55,7 +55,6 @@ class QuestionDBA(MongoDBA):
             validated_condition = validate_condition(condition)
             cursor = self.collection.find(validated_condition, session=session).limit(n)
             return [Question.from_json_obj(data) for data in cursor]
-            # return cursor
         except ValueError as err:
             Logger("QuestionDBA").log_error(f"Error when find many: {err}")
             return None
@@ -90,8 +89,8 @@ class QuestionDBA(MongoDBA):
                 {"_id": normalized_id}, {"$set": new_value}, session=session
             )
             return result.modified_count > 0
-        except ValueError as e:
-            print(e)
+        except ValueError as err:
+            Logger("QuestionDBA").log_error(f"Error when update by id: {err}")
             return False
 
     def update_many_by_id(
@@ -101,26 +100,17 @@ class QuestionDBA(MongoDBA):
             bulk_updates = prepare_bulk_updates(ids, new_values)
             result = self.collection.bulk_write(bulk_updates, session=session)
             return result.modified_count > 0
-        except ValueError as e:
-            print(e)
+        except ValueError as err:
+            Logger("QuestionDBA").log_error(f"Error when update many by id: {err}")
             return False
-
-    def insert(self, obj: Question, session=None) -> ObjectId:
-        try:
-            data = obj.to_json()
-            result = self.collection.insert_one(data, session=session)
-            return result.inserted_id
-        except ValueError as e:
-            print(e)
-            return None
 
     def delete_by_id(self, id: ObjectId, session=None) -> bool:
         try:
             normalized_id = normalize_id(id)
             result = self.collection.delete_one({"_id": normalized_id}, session=session)
             return result.deleted_count > 0
-        except ValueError as e:
-            print(e)
+        except ValueError as err:
+            Logger("QuestionDBA").log_error(f"Error when delete by id: {err}")
             return False
 
     def get_questions(self, n: int, session=None) -> List[Question]:
@@ -129,22 +119,33 @@ class QuestionDBA(MongoDBA):
             if questions is None:
                 return []
             return questions
-        except PyMongoError as e:
-            print(f"Error getting questions: {e}")
+          
+        except PyMongoError as err:
+            Logger("QuestionDBA").log_error(f"Error getting questions: {err}")
             return []
 
+#           Cần chỉnh sửa
     def update_questions(self, questions: List[Question], session=None): 
         ids, new_values = zip(*((question.get_id(), question.to_json()) for question in questions))
         updated_question = self.update_many_by_id(list(ids), list(new_values), session=session)
         if updated_question is None:
             return None
         return updated_question
-    
+#     Cần chỉnh sửa
     def delete_questions(self, ids: List[ObjectId], session=None):
         try:
             bulk_deletes = prepare_bulk_deletes(ids)
             result = self.collection.bulk_write(bulk_deletes, session=session)
             return result.deleted_count
-        except ValueError as e:
-            print(e)
-            return None
+        except PyMongoError as err:
+            Logger("QuestionDBA").log_error(f"Error delete questions: {err}")
+            return []
+
+if __name__ == "__main__":
+    question_dba = QuestionDBA()
+    # Delete questions
+    delete_data = ["66260e94a51b34b732f211df", "66260e94a51b34b732f211e0"]
+    delete_data_obj = [normalize_id(data) for data in delete_data]
+    print(delete_data_obj)
+    deleted_status = question_dba.transaction(question_dba.delete_questions, ids=delete_data)
+    print("Deleted status: ", deleted_status)
