@@ -36,6 +36,13 @@ class QuestionDBO(BaseDBO):
             return ObjectId(value)
         return value
 
+    # Chuyển đổi thành ObjectId nếu đầu vào là string trước khi validate
+    @field_validator("id", "multimedia", mode="before")
+    def convert_to_object_id(cls, value):
+        if isinstance(value, str):
+            return ObjectId(value)
+        return value
+
     def validate(self):
         pass
 
@@ -70,8 +77,14 @@ class QuestionDBO(BaseDBO):
                 setattr(b, attr, value)
 
     def to_json(self) -> Dict[str, Any]:
-        """Convert the Question object to a JSON object."""
-        return self.model_dump_json(by_alias=True)
+        data = self.model_dump(by_alias=True)
+        data["_id"] = util.toString(data["_id"])
+        data["multimedia"] = util.toString(data["multimedia"])
+        return data
+
+    def to_string(self) -> str:
+        """Convert the Question object to a string representation."""
+        return str(self.model_dump(by_alias=True))
 
     def validate_multimedia(id):
         # TODO: Ensure the multimedia ID exists in the database.

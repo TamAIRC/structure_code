@@ -149,4 +149,3 @@ if __name__ == "__main__":
     print(delete_data_obj)
     deleted_status = question_dba.transaction(question_dba.delete_questions, ids=delete_data)
     print("Deleted status: ", deleted_status)
-
