@@ -1,7 +1,7 @@
 import os
 import sys
 from bson import ObjectId
-from pydantic import ConfigDict, Field
+from pydantic import ConfigDict, Field, field_validator
 from typing import Any, Dict, List, Union
 
 
@@ -26,6 +26,13 @@ class QuestionDBO(BaseDBO):
     multimedia: ObjectId
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    # Chuyển đổi thành ObjectId nếu đầu vào là string trước khi validate
+    @field_validator("id", "multimedia", mode="before")
+    def convert_to_object_id(cls, value):
+        if isinstance(value, str):
+            return ObjectId(value)
+        return value
 
     def validate(self):
         pass
@@ -72,22 +79,6 @@ class QuestionDBO(BaseDBO):
         """Convert the Question object to a string representation."""
         return str(self.model_dump(by_alias=True))
 
-
-if __name__ == "__main__":
-    # Example data
-    example_data = {
-        "_id": ObjectId("66260e86a51b34b732f21182"),
-        "category": "Geography",
-        "subcategory": "Medieval History",
-        "content": "Phone rule we pattern be clear.",
-        "answers": ["answer1", "answer2", "answer3", "answer4"],
-        "correct_answer": "nature",
-        "difficulty": 5,
-        "required_rank": 5,
-        "language": 2,
-        "multimedia": ObjectId("66260e86a51b34b732f21182"),
-    }
-
-    # Create an instance of the Document model
-    document_instance = QuestionDBO(**example_data)
-    print(document_instance)
+    def validate_multimedia(id):
+        # TODO: Ensure the multimedia ID exists in the database.
+        return True
