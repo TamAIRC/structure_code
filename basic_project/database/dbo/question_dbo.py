@@ -27,6 +27,7 @@ class QuestionDBO(BaseDBO):
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
         validate_assignment=True,
+        json_encoders={ObjectId: str},
     )
 
     # Chuyển đổi thành ObjectId nếu đầu vào là string trước khi validate
