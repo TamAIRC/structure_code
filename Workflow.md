@@ -64,7 +64,7 @@ Sau khi PR được chấp thuận, hợp nhất (merge) vào nhánh develop.
 
 ```bash
 git checkout develop
-git merge feature/feature_name
+git merge features/feature_name
 ```
 
 ### Quy trình tạo và phát triển nhánh thử nghiệm:

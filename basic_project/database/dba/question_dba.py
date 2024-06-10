@@ -12,8 +12,6 @@ from database.dba.mongo_dba import MongoDBA
 from configs import db_config
 from utils.util import (
     normalize_id,
-    prepare_bulk_deletes,
-    prepare_bulk_updates,
     validate_condition,
 )
 
@@ -79,7 +77,7 @@ class QuestionDBA(MongoDBA):
             Logger("QuestionDBA").log_error(f"Error when insert many: {err}")
             return None
 
-    def update_one_by_id(
+    def update_one(
         self, id: ObjectId, new_value: Dict[str, Any], session=None
     ) -> bool:
         try:
@@ -92,11 +90,11 @@ class QuestionDBA(MongoDBA):
             Logger("QuestionDBA").log_error(f"Error when update by id: {err}")
             return False
 
-    def update_many_by_id(
+    def update_many(
         self, ids: List[ObjectId], new_values: List[Dict[str, Any]], session=None
     ) -> bool:
         try:
-            bulk_updates = prepare_bulk_updates(ids, new_values)
+            bulk_updates = self.prepare_bulk_updates(ids, new_values)
             result = self.collection.bulk_write(bulk_updates, session=session)
             return result.modified_count > 0
         except ValueError as err:
@@ -118,33 +116,29 @@ class QuestionDBA(MongoDBA):
             if questions is None:
                 return []
             return questions
-          
+
         except PyMongoError as err:
             Logger("QuestionDBA").log_error(f"Error getting questions: {err}")
             return []
 
-#           Cần chỉnh sửa
-    def update_questions(self, questions: List[Question], session=None): 
-        ids, new_values = zip(*((question.get_id(), question.to_json()) for question in questions))
-        updated_question = self.update_many_by_id(list(ids), list(new_values), session=session)
+    # Cần chỉnh sửa
+    def update_questions(self, questions: List[Question], session=None):
+        ids, new_values = zip(
+            *((question.get_id(), question.to_json()) for question in questions)
+        )
+        updated_question = self.update_many(
+            list(ids), list(new_values), session=session
+        )
         if updated_question is None:
             return None
         return updated_question
-#     Cần chỉnh sửa
+
+    # Cần chỉnh sửa
     def delete_questions(self, ids: List[ObjectId], session=None):
         try:
-            bulk_deletes = prepare_bulk_deletes(ids)
+            bulk_deletes = self.prepare_bulk_deletes(ids)
             result = self.collection.bulk_write(bulk_deletes, session=session)
             return result.deleted_count
         except PyMongoError as err:
             Logger("QuestionDBA").log_error(f"Error delete questions: {err}")
             return []
-
-if __name__ == "__main__":
-    question_dba = QuestionDBA()
-    # Delete questions
-    delete_data = ["66260e94a51b34b732f211df", "66260e94a51b34b732f211e0"]
-    delete_data_obj = [normalize_id(data) for data in delete_data]
-    print(delete_data_obj)
-    deleted_status = question_dba.transaction(question_dba.delete_questions, ids=delete_data)
-    print("Deleted status: ", deleted_status)
