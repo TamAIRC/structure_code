@@ -10,7 +10,6 @@ project_root = os.path.abspath(os.path.join(current_dir, "../../"))
 sys.path.append(project_root)
 
 from patterns.base_dbo import BaseDBO
-from utils import util
 
 
 class QuestionDBO(BaseDBO):
@@ -23,9 +22,19 @@ class QuestionDBO(BaseDBO):
     difficulty: int
     required_rank: int
     language: int
-    multimedia: ObjectId
+    multimedia: Optional[ObjectId] = Field(default=None)
 
-    model_config = ConfigDict(arbitrary_types_allowed=True)
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True,
+        validate_assignment=True,
+    )
+
+    # Chuyển đổi thành ObjectId nếu đầu vào là string trước khi validate
+    @field_validator("id", "multimedia", mode="before")
+    def convert_to_object_id(cls, value):
+        if isinstance(value, str):
+            return ObjectId(value)
+        return value
 
     # Chuyển đổi thành ObjectId nếu đầu vào là string trước khi validate
     @field_validator("id", "multimedia", mode="before")
