@@ -12,8 +12,6 @@ from database.dba.mongo_dba import MongoDBA
 from configs import db_config
 from utils.util import (
     normalize_id,
-    prepare_bulk_deletes,
-    prepare_bulk_updates,
     validate_condition,
 )
 
@@ -80,7 +78,7 @@ class QuestionDBA(MongoDBA):
             Logger("QuestionDBA").log_error(f"Error when insert many: {err}")
             return None
 
-    def update_one_by_id(
+    def update_one(
         self, id: ObjectId, new_value: Dict[str, Any], session=None
     ) -> bool:
         try:
@@ -93,11 +91,11 @@ class QuestionDBA(MongoDBA):
             Logger("QuestionDBA").log_error(f"Error when update by id: {err}")
             return False
 
-    def update_many_by_id(
+    def update_many(
         self, ids: List[ObjectId], new_values: List[Dict[str, Any]], session=None
     ) -> bool:
         try:
-            bulk_updates = prepare_bulk_updates(ids, new_values)
+            bulk_updates = self.prepare_bulk_updates(ids, new_values)
             result = self.collection.bulk_write(bulk_updates, session=session)
             return result.modified_count > 0
         except ValueError as err:
@@ -129,7 +127,7 @@ class QuestionDBA(MongoDBA):
         ids, new_values = zip(
             *((question.get_id(), question.to_json()) for question in questions)
         )
-        updated_question = self.update_many_by_id(
+        updated_question = self.update_many(
             list(ids), list(new_values), session=session
         )
         if updated_question is None:
@@ -139,7 +137,7 @@ class QuestionDBA(MongoDBA):
     # Cần chỉnh sửa
     def delete_questions(self, ids: List[ObjectId], session=None):
         try:
-            bulk_deletes = prepare_bulk_deletes(ids)
+            bulk_deletes = self.prepare_bulk_deletes(ids)
             result = self.collection.bulk_write(bulk_deletes, session=session)
             return result.deleted_count
         except PyMongoError as err:
