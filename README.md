@@ -3,5 +3,5 @@
 ## Table of Contents
 
 - [Project Structure](project_structure.md)
-- [Workflow Git](project_structure.md)
+- [Workflow Git](Workflow.md)
 - [Naming Rules](NamingRules.md)

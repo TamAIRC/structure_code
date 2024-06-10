@@ -67,6 +67,7 @@ def validate_condition(condition):
         raise ValueError("Condition must be a dictionary")
     return condition
 
+
 def prepare_bulk_updates(ids: List[ObjectId], new_values: List[Dict[str, Any]]):
     """
     #     Prepare a list of bulk update operations.
