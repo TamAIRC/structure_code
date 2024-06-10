@@ -1,49 +1,59 @@
 # routes/question_routes.py
-from fastapi import APIRouter
+from fastapi import APIRouter, Query, HTTPException, Depends
 from typing import List
 import os
 import sys
+import asyncio
 
 current_dir = os.path.dirname(__file__)
 project_root = os.path.abspath(os.path.join(current_dir, "../"))
 sys.path.append(project_root)
 
 from controllers.question_controller import QuestionController
+from utils.util import validate_input, validate_positive_number
 
 router = APIRouter()
 
+async def get_session_id():
+    # Generate a unique session ID for each request or retrieve from user context
+    # For simplicity, using a static ID. In production, use a user-specific or request-specific ID.
+    return "default_session"
 
 @router.get("/questions")
-async def get_questions():
-    # lay N quan sat tu bang cau hoi
-    # tham so hoa (N quan sat)
+async def get_questions(N: int = Query(description="Number of questions to retrieve"), session_id: str = Depends(get_session_id)):
+    try:
+        if not validate_positive_number(N):
+            return {"status": False, "message": "Input must be a positive number"}
+        
+        question_controller = QuestionController()
+        successed, questions = await question_controller.get_questions(N, session_id)
+        if successed:
+            return {"status": True, "data": questions}
+        else:
+            return {"status": False, "error_code": 202, "error_message": "Failed to fetch questions from the database."}
+    except Exception as err:
+        return {"status": False, "error_code": 404, "error_message": str(err)}
     
-    # xu ly authorization
-    # lay tham so len?
-    # xu ly validate tham so 
-    N = 100 # xu ly tu request
+@router.put("/questions")
+async def update_questions(data: List[dict], session_id: str = Depends(get_session_id)):
     try:
         question_controller = QuestionController()
-        # tach qua trinh xuy ly ket qua controller ra khoi ket quar tra ve cua API
-        await successed, questions question_controller.get_questions(N) # tham so
+        successed = await question_controller.update_questions(data, session_id)
         if successed:
-            result = {
-                "status": True,
-                "data": questions
-            }
-            return result
+            return {"status": True}
         else:
-            error_result = {
-                "status": False,
-                "error_code": 202 #loi database server
-                "error_message":err
-            }
-            return error_result
+            return {"status": False, "error_code": 202, "error_message": "Failed to update questions."}
     except Exception as err:
-        # ghi log khi co loi
-        error_result = {
-            "status": False,
-            "error_code": 404 #loi web_server
-            "error_message":err
-        }
-        return error_result
+        raise HTTPException(status_code=404, detail=str(err))
+
+@router.delete("/questions")
+async def delete_questions(data: List[str], session_id: str = Depends(get_session_id)):
+    try:
+        question_controller = QuestionController()
+        successed = await question_controller.delete_questions(data, session_id)
+        if successed:
+            return {"status": True}
+        else:
+            return {"status": False, "error_code": 202, "error_message": "Failed to delete questions."}
+    except Exception as err:
+        raise HTTPException(status_code=404, detail=str(err))
