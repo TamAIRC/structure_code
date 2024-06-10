@@ -14,10 +14,16 @@ if __name__ == "__main__":
     # result1 = dba.get_100_questions()
     # print(result1)
     question_dba = QuestionDBA()
-    # print(question_dba.get_n_questions(100))
-    new_data = [{'_id': ObjectId("66260e94a51b34b732f211dd"), 'category': 'Geography', 'subcategory': 'Medieval History', 'content': 'Phone rule we pattern be clear.', 'answers': ['why', 'east', 'nature', 'attention'], 'correct_answer': 'nature', 'difficulty': 5, 'required_rank': 5, 'language': 2, 'multimedia': ObjectId('66260e86a51b34b732f21182')}]
-    new_question = [QuestionDBO.from_json_obj(data) for data in new_data]
-    # question_dba.update_n_questions(new_question)
-    question_dba.update_many_by_id([ObjectId("66260e94a51b34b732f211dd")], new_data)
-    print()
-    print(question_dba.find_by_id(ObjectId('66260e94a51b34b732f211dd')))
+    new_data = QuestionDBO(
+        category= 1, 
+        subcategory= 'Medieval History', 
+        content= 'Phone rule we pattern be clear.',
+        answers= ['why', 'east', 'nature', 'attention'], 
+        correct_answer= 'nature', 
+        difficulty= 5, 
+        required_rank= 5,
+        language= 2,
+        multimedia= ObjectId()
+    )
+    r = question_dba.transaction(question_dba.insert_many, objs= [new_data])
+    print(r)

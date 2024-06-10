@@ -64,7 +64,6 @@ class QuestionDBA(MongoDBA):
         try:
             Question.validate_multimedia(obj.multimedia)
             data = obj.model_dump(exclude_defaults=True)
-            print("insert: ", data)
             result = self.collection.insert_one(data, session=session)
             return result.inserted_id
         except ValueError as err:
@@ -105,14 +104,6 @@ class QuestionDBA(MongoDBA):
             print(e)
             return False
 
-    def insert(self, obj: Question, session=None) -> ObjectId:
-        try:
-            data = obj.to_json()
-            result = self.collection.insert_one(data, session=session)
-            return result.inserted_id
-        except ValueError as e:
-            print(e)
-            return None
 
     def delete_by_id(self, id: ObjectId, session=None) -> bool:
         try:

@@ -33,6 +33,22 @@ async def get_questions(N: int = Query(description="Number of questions to retri
             return {"status": False, "error_code": 202, "error_message": "Failed to fetch questions from the database."}
     except Exception as err:
         return {"status": False, "error_code": 404, "error_message": str(err)}
+@router.post("/questions")
+async def insert_questions(data: List[dict]):
+    try:
+        for question in data:
+            if not validate_input(question):
+                return {"status": False, "message": "Input must be a dictionary"}
+        
+        question_controller = QuestionController()
+        successed = await question_controller.insert_questions(data)
+        if successed:
+            return {"status": True}
+        else:
+            return {"status": False, "error_code": 202, "error_message": "Failed to update questions."}
+    except Exception as err:
+        return {"status": False, "error_code": 404, "error_message": str(err)}
+    
     
 @router.put("/questions")
 async def update_questions(data: List[dict], session_id: str = Depends(get_session_id)):

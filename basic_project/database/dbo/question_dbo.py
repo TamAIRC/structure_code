@@ -2,7 +2,7 @@ import os
 import sys
 from bson import ObjectId
 from pydantic import ConfigDict, Field, field_validator
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Union, Optional
 
 
 current_dir = os.path.dirname(__file__)
@@ -14,7 +14,7 @@ from utils import util
 
 
 class QuestionDBO(BaseDBO):
-    id: ObjectId = Field(default_factory=ObjectId, alias="_id")
+    id: Optional[ObjectId] = Field(default=None, alias="_id")
     category: Union[int, str]
     subcategory: str
     content: str
@@ -46,8 +46,10 @@ class QuestionDBO(BaseDBO):
     @classmethod
     def from_json_obj(cls, json_obj: Dict[str, Any]):
         """Convert JSON object to data format."""
-        json_obj["_id"] = ObjectId(json_obj["_id"])
-        json_obj["multimedia"] = ObjectId(json_obj["multimedia"])
+        if json_obj['_id']:
+            json_obj["_id"] = ObjectId(json_obj["_id"])
+        if json_obj['multimedia']:
+            json_obj["multimedia"] = ObjectId(json_obj["multimedia"])
         return cls(**json_obj)
 
     @classmethod
