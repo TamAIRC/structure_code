@@ -24,122 +24,114 @@ class QuestionDBA(MongoDBA):
     def __init__(self):
         super().__init__(db_config.SCHEMA["QUESTIONS"])
 
-    def find_by_id(self, id: ObjectId, session=None) -> Question:
-        try:
-            normalized_id = normalize_id(id)
-            result = self.collection.find_one({"_id": normalized_id}, session=session)
-            if result:
-                return Question(**result)
-            return None
-        except ValueError as err:
-            Logger("QuestionDBA").log_error(f"Error when find by id: {err}")
-            return None
+    # Private funtion
+    def __find_one(self, condition: Dict[str, Any], session=None) -> Question:
+        pass
 
-    def find_one(self, condition: Dict[str, Any], session=None) -> Question:
-        try:
-            validated_condition = validate_condition(condition)
-            result = self.collection.find_one(validated_condition, session=session)
-            if result:
-                return Question(**result)
-            return None
-        except ValueError as err:
-            Logger("QuestionDBA").log_error(f"Error when find one: {err}")
-            return None
-
-    def find_many(
-        self, n: int, condition: Dict[str, Any], session=None
+    def __find_many(
+        self, condition: List[Any], n: int = None, session=None
     ) -> List[Question]:
-        try:
-            validated_condition = validate_condition(condition)
-            cursor = self.collection.find(validated_condition, session=session).limit(n)
-            return [Question.from_json_obj(data) for data in cursor]
-        except ValueError as err:
-            Logger("QuestionDBA").log_error(f"Error when find many: {err}")
-            return None
+        pass
 
-    def insert(self, obj: Question, session=None) -> ObjectId:
-        try:
-            Question.validate_multimedia(obj.multimedia)
-            data = obj.model_dump(exclude_defaults=True)
-            print("insert: ", data)
-            result = self.collection.insert_one(data, session=session)
-            return result.inserted_id
-        except ValueError as err:
-            Logger("QuestionDBA").log_error(f"Error when insert: {err}")
-            return None
+    def __find_by_id(self, id, session=None) -> Question:
+        pass
 
-    def insert_many(self, objs: List[Question], session=None) -> List[ObjectId]:
-        try:
-            Question.validate_multimedia([obj.multimedia for obj in objs])
-            data = [obj.model_dump(exclude_defaults=True) for obj in objs]
-            result = self.collection.insert_many(data, session=session)
-            return result.inserted_ids
-        except ValueError as err:
-            Logger("QuestionDBA").log_error(f"Error when insert many: {err}")
-            return None
+    def __find_by_ids(self, ids: List[Any], session=None) -> List[Question]:
+        pass
 
-    def update_one(
-        self, id: ObjectId, new_value: Dict[str, Any], session=None
+    def __insert_one(self, obj: Any, session=None) -> ObjectId:
+        pass
+
+    def __insert_many(self, obj: Any, session=None) -> List[ObjectId]:
+        pass
+
+    def __update_one(
+        self, condition: Dict[str, Any], new_value: List[Any], session=None
     ) -> bool:
-        try:
-            normalized_id = normalize_id(id)
-            result = self.collection.update_one(
-                {"_id": normalized_id}, {"$set": new_value}, session=session
-            )
-            return result.modified_count > 0
-        except ValueError as err:
-            Logger("QuestionDBA").log_error(f"Error when update by id: {err}")
-            return False
+        pass
 
-    def update_many(
-        self, ids: List[ObjectId], new_values: List[Dict[str, Any]], session=None
+    def __update_many(
+        self, condition: List[Any], new_values: List[Any], session=None
     ) -> bool:
-        try:
-            bulk_updates = self.prepare_bulk_updates(ids, new_values)
-            result = self.collection.bulk_write(bulk_updates, session=session)
-            return result.modified_count > 0
-        except ValueError as err:
-            Logger("QuestionDBA").log_error(f"Error when update many by id: {err}")
-            return False
+        pass
 
-    def delete_by_id(self, id: ObjectId, session=None) -> bool:
-        try:
-            normalized_id = normalize_id(id)
-            result = self.collection.delete_one({"_id": normalized_id}, session=session)
-            return result.deleted_count > 0
-        except ValueError as err:
-            Logger("QuestionDBA").log_error(f"Error when delete by id: {err}")
-            return False
+    def __update_by_id(self, id, new_value: List[Any], session=None) -> bool:
+        pass
 
-    def get_questions(self, n: int, session=None) -> List[Question]:
-        try:
-            questions = self.find_many(n, {}, session=session)
-            if questions is None:
-                return []
-            return questions
+    def __update_by_ids(
+        self, ids: List[Any], new_values: List[Any], session=None
+    ) -> bool:
+        pass
 
-        except PyMongoError as err:
-            Logger("QuestionDBA").log_error(f"Error getting questions: {err}")
-            return []
+    def __delete_one(self, condition: Dict[str, Any], session=None) -> bool:
+        pass
 
-    # Cần chỉnh sửa
-    def update_questions(self, questions: List[Question], session=None):
-        ids, new_values = zip(
-            *((question.get_id(), question.to_json()) for question in questions)
+    def __delete_many(self, condition: List[Any], session=None) -> bool:
+        pass
+
+    def __delete_by_id(self, id, session=None) -> bool:
+        pass
+
+    def __delete_by_ids(self, ids: List[Any], session=None) -> bool:
+        pass
+
+    # Public funtion
+    def find_one(self, condition: Dict[str, Any]) -> Question:
+        result = self.transaction(self.__find_one, condition=condition)
+        return result
+
+    def find_many(self, condition: List[Any], n: int = None) -> List[Question]:
+        result = self.transaction(self.__find_many, condition=condition)
+        return result
+
+    def find_by_id(self, id) -> Question:
+        result = self.transaction(self.__find_by_id, id=id)
+        return result
+
+    def find_by_ids(self, ids: List[Any]) -> List[Question]:
+        result = self.transaction(self.__find_by_ids, ids=ids)
+        return result
+
+    def insert_one(self, obj: Any) -> ObjectId:
+        result = self.transaction(self.__insert_one, obj=obj)
+        return result
+
+    def insert_many(self, obj: Any) -> List[ObjectId]:
+        result = self.transaction(self.__insert_many, obj=obj)
+        return result
+
+    def update_one(self, condition: Dict[str, Any], new_value: List[Any]) -> bool:
+        result = self.transaction(
+            self.__update_one, condition=condition, new_value=new_value
         )
-        updated_question = self.update_many(
-            list(ids), list(new_values), session=session
-        )
-        if updated_question is None:
-            return None
-        return updated_question
+        return result
 
-    # Cần chỉnh sửa
-    def delete_questions(self, ids: List[ObjectId], session=None):
-        try:
-            bulk_deletes = self.prepare_bulk_deletes(ids)
-            result = self.collection.bulk_write(bulk_deletes, session=session)
-            return result.deleted_count
-        except PyMongoError as err:
-            Logger("QuestionDBA").log_error(f"Error delete questions: {err}")
-            return []
+    def update_many(self, condition: List[Any], new_values: List[Any]) -> bool:
+        result = self.transaction(
+            self.__update_many, condition=condition, new_values=new_values
+        )
+        return result
+
+    def update_by_id(self, id, new_value: List[Any]) -> bool:
+        result = self.transaction(self.__update_by_id, id=id, new_value=new_value)
+        return result
+
+    def update_by_ids(self, ids: List[Any], new_values: List[Any]) -> bool:
+        result = self.transaction(self.__update_by_ids, ids=ids, new_values=new_values)
+        return result
+
+    def delete_one(self, condition: Dict[str, Any]) -> bool:
+        result = self.transaction(self.__delete_one, condition=condition)
+        return result
+
+    def delete_many(self, condition: List[Any]) -> bool:
+        result = self.transaction(self.__delete_many, condition=condition)
+        return result
+
+    def delete_by_id(self, id) -> bool:
+        result = self.transaction(self.__delete_by_id, id=id)
+        return result
+
+    def delete_by_ids(self, ids: List[Any]) -> bool:
+        result = self.transaction(self.__delete_by_ids, ids=ids)
+        return result

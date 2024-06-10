@@ -20,6 +20,14 @@ class BaseDBA(ABC):
         pass
 
     @abstractmethod
+    def find_by_id(self, id) -> Any:
+        pass
+
+    @abstractmethod
+    def find_by_ids(self, ids: List[Any]) -> Any:
+        pass
+
+    @abstractmethod
     def insert_one(self, obj: Any):
         pass
 
@@ -36,9 +44,25 @@ class BaseDBA(ABC):
         pass
 
     @abstractmethod
+    def update_by_id(self, id, new_value: List[Any]) -> bool:
+        pass
+
+    @abstractmethod
+    def update_by_ids(self, ids: List[Any], new_values: List[Any]) -> bool:
+        pass
+
+    @abstractmethod
     def delete_one(self, condition) -> bool:
         pass
 
     @abstractmethod
     def delete_many(self, condition) -> bool:
+        pass
+
+    @abstractmethod
+    def delete_by_id(self, id) -> bool:
+        pass
+
+    @abstractmethod
+    def delete_by_ids(self, ids: List[Any]) -> bool:
         pass
