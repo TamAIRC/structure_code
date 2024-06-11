@@ -29,7 +29,7 @@ class QuestionDBA(MongoDBA):
         pass
 
     def __find_many(
-        self, condition: List[Any], n: int = None, session=None
+        self, condition: Dict[str, Any], n: int = None, session=None
     ) -> List[Question]:
         pass
 
@@ -48,39 +48,85 @@ class QuestionDBA(MongoDBA):
     def __update_one(
         self, condition: Dict[str, Any], new_value: List[Any], session=None
     ) -> bool:
-        pass
+        try:
+            result = self.collection.update_one(condition, {"$set": new_value}, session=session)
+            return result.modified_count > 0
+        except ValueError as err:
+            Logger("QuestionDBA").log_error(f"Error when update one: {err}")
+            return False
 
     def __update_many(
-        self, condition: List[Any], new_values: List[Any], session=None
+        self, condition: Dict[str, Any], new_values: List[Any], session=None
     ) -> bool:
-        pass
+        try:
+            result = self.collection.update_many(condition, {"$set": new_values}, session=session)
+            return result.modified_count > 0
+        except ValueError as err:
+            Logger("QuestionDBA").log_error(f"Error when update many: {err}")
+            return False
 
     def __update_by_id(self, id, new_value: List[Any], session=None) -> bool:
-        pass
+        try:
+            normalized_id = normalize_id(id)
+            result = self.collection.update_one(
+                {"_id": normalized_id}, {"$set": new_value}, session=session
+            )
+            return result.modified_count > 0
+        except ValueError as err:
+            Logger("QuestionDBA").log_error(f"Error when update by id: {err}")
+            return False
 
     def __update_by_ids(
         self, ids: List[Any], new_values: List[Any], session=None
     ) -> bool:
-        pass
+        try:
+            bulk_updates = self.prepare_bulk_updates(ids, new_values)
+            result = self.collection.bulk_write(bulk_updates, session=session)
+            return result.modified_count > 0
+        except ValueError as err:
+            Logger("QuestionDBA").log_error(f"Error when update many by id: {err}")
+            return False
 
     def __delete_one(self, condition: Dict[str, Any], session=None) -> bool:
-        pass
+        try:
+            result = self.collection.delete_one(condition, session=session)
+            return result.deleted_count > 0
+        except ValueError as err:
+            Logger("QuestionDBA").log_error(f"Error when delete one: {err}")
+            return False
 
-    def __delete_many(self, condition: List[Any], session=None) -> bool:
-        pass
+    def __delete_many(self, condition: Dict[str, Any], session=None) -> bool:
+        try:
+            result = self.collection.delete_many(condition, session=session)
+            return result.deleted_count > 0
+        except ValueError as err:
+            Logger("QuestionDBA").log_error(f"Error when delete many: {err}")
+            return False
 
     def __delete_by_id(self, id, session=None) -> bool:
-        pass
+        try:
+            normalized_id = normalize_id(id)
+            result = self.collection.delete_one({"_id": normalized_id}, session=session)
+            return result.deleted_count > 0
+        except ValueError as err:
+            Logger("QuestionDBA").log_error(f"Error when delete by id: {err}")
+            return False
 
     def __delete_by_ids(self, ids: List[Any], session=None) -> bool:
-        pass
+        try:
+            bulk_deletes = self.prepare_bulk_deletes(ids)
+            result = self.collection.bulk_write(bulk_deletes, session=session)
+            return result.deleted_count > 0
+        except ValueError as err:
+            Logger("QuestionDBA").log_error(f"Error when delete many by id: {err}")
+            return False
 
     # Public funtion
     def find_one(self, condition: Dict[str, Any]) -> Question:
         result = self.transaction(self.__find_one, condition=condition)
         return result
 
-    def find_many(self, condition: List[Any], n: int = None) -> List[Question]:
+    def find_many(self, condition: Dict[str, Any], n: int = None) -> List[Question]:
         result = self.transaction(self.__find_many, condition=condition)
         return result
 
@@ -106,7 +152,7 @@ class QuestionDBA(MongoDBA):
         )
         return result
 
-    def update_many(self, condition: List[Any], new_values: List[Any]) -> bool:
+    def update_many(self, condition: Dict[str, Any], new_values: List[Any]) -> bool:
         result = self.transaction(
             self.__update_many, condition=condition, new_values=new_values
         )
@@ -124,7 +170,7 @@ class QuestionDBA(MongoDBA):
         result = self.transaction(self.__delete_one, condition=condition)
         return result
 
-    def delete_many(self, condition: List[Any]) -> bool:
+    def delete_many(self, condition: Dict[str, Any]) -> bool:
         result = self.transaction(self.__delete_many, condition=condition)
         return result
 

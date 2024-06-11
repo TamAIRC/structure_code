@@ -3,9 +3,6 @@ from typing import Any, List
 
 
 class BaseDBA(ABC):
-    def __init__(self) -> None:
-        pass
-
     @abstractmethod
     def transaction(self, query_func):
         """Perform a transaction. Implementation depends on specific use case."""
