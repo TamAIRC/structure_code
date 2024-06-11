@@ -82,28 +82,27 @@ def test_QuestionDBA():
     id_test = ""
 
     # Test insert
-    id_test = question_dba.transaction(question_dba.insert, obj=sample_question)
+    id_test = question_dba.insert_one(obj=sample_question)
     print("insert", id_test)
 
     print("=====================")
 
     # Test find_by_id
-    result = question_dba.transaction(
-        question_dba.find_by_id, id=ObjectId(id_test)
+    result = question_dba.find_by_id(
+        ObjectId(id_test)
     )
     print("find_by_id")
     print(result)
     print("=====================")
 
     # Test insert_many
-    result = question_dba.transaction(question_dba.insert_many, objs=[sample_question])
+    result = question_dba.insert_many(objs=[sample_question])
     print("insert_many")
     print(result)
     print("=====================")
 
     # Test update_one_by_id
-    result = question_dba.transaction(
-        question_dba.update_one_by_id,
+    result = question_dba.update_by_id(
         id=id_test,
         new_value={"content": "Updated Question"},
     )
@@ -112,8 +111,7 @@ def test_QuestionDBA():
     print("=====================")
 
     # Test update_many_by_id
-    result = question_dba.transaction(
-        question_dba.update_many_by_id,
+    result = question_dba.update_by_ids(
         ids=[id_test],
         new_values=[{"content": "Updated Question"}],
     )
@@ -123,23 +121,23 @@ def test_QuestionDBA():
 
     # Test find_one
     print("find_one")
-    result = question_dba.transaction(
-        question_dba.find_one, condition={"category": "Geography"}
+    result = question_dba.find_one(
+        condition={"category": "Geography"}
     )
     print(result)
     print("=====================")
 
     # Test find_many
     print("find_many")
-    result = question_dba.transaction(
-        question_dba.find_many, n=1, condition={"category": "Geography"}
+    result = question_dba.find_many(
+        n=1, condition={"category": "Geography"}
     )
     print(result)
     print("=====================")
 
     # # Test delete_by_id
     print("delete_by_id")
-    result = question_dba.transaction(question_dba.delete_by_id, id=id_test)
+    result = question_dba.delete_by_id(id=id_test)
     print(result)
     
     # Delete questions
@@ -154,5 +152,5 @@ def test_QuestionDBA():
 
 if __name__ == "__main__":
 
-    test_QuestionDBO()
+    # test_QuestionDBO()
     test_QuestionDBA()

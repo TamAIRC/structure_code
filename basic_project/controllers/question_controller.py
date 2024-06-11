@@ -15,14 +15,16 @@ from controllers.session_manager import session_manager
 from typing import List, Tuple
 
 class QuestionController:
+    current_questions = []
     def __init__(self):
         self.dba = QuestionDBA()
 
-    async def get_questions(self, n: int, session_id: str) -> Tuple[bool, List[dict]]:
+    async def get_questions(self, n: int) -> Tuple[bool, List[dict]]:
         try:
-            result = self.dba.transaction(self.dba.get_questions, n=n)
-            session_manager.store_questions(session_id, result)
-            json_questions = [QuestionDBO.to_json(question) for question in result]
+            result = self.dba.find_many({}, n)
+            # session_manager.store_questions(session_id, result)
+            QuestionController.current_questions = result
+            json_questions = [question.to_json() for question in result]
             successed = True    
             return successed, json_questions
         except Exception as e:
@@ -30,22 +32,23 @@ class QuestionController:
             print("Exception in get_questions:", e)
             return successed, None
 
-    async def insert_questions(self, questions: List[dict]) -> bool:
-        try:
-            for question in questions:
-                question['multimedia'] = normalize_id(question["multimedia"])
-            questions = [QuestionDBO(**question) for question in questions]
-            self.dba.transaction(self.dba.insert_many, objs= questions)
-            successed = True
-            return successed
-        except Exception as e:
-            print("Exception in insert_questions in controllers:", e)
-            successed = False
-            return successed
-    async def update_questions(self, in_questions: List[dict], session_id: str) -> bool:
+    # async def insert_questions(self, questions: List[dict]) -> bool:
+    #     try:
+    #         for question in questions:
+    #             question['multimedia'] = normalize_id(question["multimedia"])
+    #         questions = [QuestionDBO(**question) for question in questions]
+    #         self.dba.transaction(self.dba.insert_many, objs= questions)
+    #         successed = True
+    #         return successed
+    #     except Exception as e:
+    #         print("Exception in insert_questions in controllers:", e)
+    #         successed = False
+    #         return successed
+    async def update_questions(self, in_questions: List[dict]) -> bool:
         try:
             in_questions = [QuestionDBO.from_json_obj(question) for question in in_questions]
-            current_questions = session_manager.get_questions(session_id)
+            current_questions = QuestionController.current_questions
+            print("current_questions: ",current_questions)
             current_questions_dict = {q.id: q for q in current_questions}
             questions_to_update = []
 
@@ -56,7 +59,7 @@ class QuestionController:
                 if current_question and incoming_question != current_question:
                     questions_to_update.append(incoming_question)
             if questions_to_update:
-                self.dba.transaction(self.dba.update_questions, questions = questions_to_update)
+                self.dba.update_questions(questions_to_update)
             successed = True    
             return successed
         except Exception as e:
@@ -64,14 +67,14 @@ class QuestionController:
             successed = False
             return successed
     
-    async def delete_questions(self, ids: List[str], session_id: str) -> bool:
-        try:
-            ids = [normalize_id(id) for id in ids]
-            self.dba.transaction(self.dba.delete_questions, ids=ids)
-            successed = True    
-            return successed
-        except Exception as e:
-            print("Exception in delete_questions:", e)
-            successed = False
-            return successed
+    # async def delete_questions(self, ids: List[str], session_id: str) -> bool:
+    #     try:
+    #         ids = [normalize_id(id) for id in ids]
+    #         self.dba.transaction(self.dba.delete_questions, ids=ids)
+    #         successed = True    
+    #         return successed
+    #     except Exception as e:
+    #         print("Exception in delete_questions:", e)
+    #         successed = False
+    #         return successed
         

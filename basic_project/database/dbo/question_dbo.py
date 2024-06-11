@@ -82,7 +82,9 @@ class QuestionDBO(BaseDBO):
                 setattr(b, attr, value)
 
     def to_json(self) -> Dict[str, Any]:
-        data = self.model_dump_json(by_alias=True)
+        data = self.dict(by_alias=True)
+        data["_id"] = str(data["_id"]) if data["_id"] else None
+        data["multimedia"] = str(data["multimedia"]) if data["multimedia"] else None
         return data
 
     def to_string(self) -> str:

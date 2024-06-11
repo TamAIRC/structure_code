@@ -14,19 +14,14 @@ from utils.util import validate_input, validate_positive_number
 
 router = APIRouter()
 
-async def get_session_id():
-    # Generate a unique session ID for each request or retrieve from user context
-    # For simplicity, using a static ID. In production, use a user-specific or request-specific ID.
-    return "default_session"
 
 @router.get("/questions")
-async def get_questions(N: int = Query(description="Number of questions to retrieve"), session_id: str = Depends(get_session_id)):
+async def get_questions(N: int = Query(description="Number of questions to retrieve")):
     try:
         if not validate_positive_number(N):
             return {"status": False, "message": "Input must be a positive number"}
-        
         question_controller = QuestionController()
-        successed, questions = await question_controller.get_questions(N, session_id)
+        successed, questions = await question_controller.get_questions(N)
         if successed:
             return {"status": True, "data": questions}
         else:
@@ -51,10 +46,10 @@ async def insert_questions(data: List[dict]):
     
     
 @router.put("/questions")
-async def update_questions(data: List[dict], session_id: str = Depends(get_session_id)):
+async def update_questions(data: List[dict]):
     try:
         question_controller = QuestionController()
-        successed = await question_controller.update_questions(data, session_id)
+        successed = await question_controller.update_questions(data)
         if successed:
             return {"status": True}
         else:
@@ -63,10 +58,10 @@ async def update_questions(data: List[dict], session_id: str = Depends(get_sessi
         raise HTTPException(status_code=404, detail=str(err))
 
 @router.delete("/questions")
-async def delete_questions(data: List[str], session_id: str = Depends(get_session_id)):
+async def delete_questions(data: List[str]):
     try:
         question_controller = QuestionController()
-        successed = await question_controller.delete_questions(data, session_id)
+        successed = await question_controller.delete_questions(data)
         if successed:
             return {"status": True}
         else:
