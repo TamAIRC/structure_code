@@ -21,7 +21,6 @@ from pymongo.errors import ServerSelectionTimeoutError, ConnectionFailure, PyMon
 
 class MongoDBA(BaseDBA):
     def __init__(self, collection_name):
-        super.__init__()
         self.collection_name = collection_name
         self.collection = None
 
