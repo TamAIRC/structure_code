@@ -101,27 +101,31 @@ class MongoDBA(BaseDBA):
     def delete_many(self, condition: Dict[str, Any]) -> bool:
         pass
 
-    # def prepare_bulk_update_by_ids(ids: List[ObjectId], new_values: List[Dict[str, Any]]):
-    #     if len(ids) != len(new_values):
-    #         raise ValueError("The length of ids and new_values must match")
-    #     bulk_updates = []
-    #     for _id, values in zip(ids, new_values):
-    #         try:
-    #             normalized_id = normalize_id(_id)
-    #             # Ensure _id is not included in the update part
-    #             update_values = {k: v for k, v in values.items() if k != "_id"}
-    #             bulk_updates.append(
-    #                 UpdateOne({"_id": normalized_id}, {"$set": update_values})
-    #             )
-    #         except ValueError as e:
-    #             raise ValueError(f"Error processing ID {id}: {e}") from e
-    #     return bulk_updates
-    def prepare_bulk_updates(condition: Dict[str, Any], new_values: Dict[str, Any]):
-        try:
-            update_values = {k: v for k, v in new_values.items() if k != condition}
-            return UpdateOne(condition, {"$set": update_values})
-        except ValueError as e:
-            raise ValueError(f"Error processing update values: {e}") from e
+    def prepare_bulk_updates(ids: List[ObjectId], new_values: List[Dict[str, Any]]):
+        """
+        #     Prepare a list of bulk update operations.
+
+        #     Parameters:
+        #     - ids: list of str or ObjectId
+        #     - new_values: list of dict
+
+        #     Returns:
+        #     - list of dict
+        #"""
+        if len(ids) != len(new_values):
+            raise ValueError("The length of ids and new_values must match")
+        bulk_updates = []
+        for _id, values in zip(ids, new_values):
+            try:
+                normalized_id = normalize_id(_id)
+                # Ensure _id is not included in the update part
+                update_values = {k: v for k, v in values.items() if k != "_id"}
+                bulk_updates.append(
+                    UpdateOne({"_id": normalized_id}, {"$set": update_values})
+                )
+            except ValueError as e:
+                raise ValueError(f"Error processing ID {id}: {e}") from e
+        return bulk_updates
 
     def prepare_bulk_deletes(ids):
         """

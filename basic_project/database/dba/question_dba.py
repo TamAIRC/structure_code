@@ -230,21 +230,3 @@ class QuestionDBA(MongoDBA):
     def update_questions(self, questions: List[Question]):
         result = self.transaction(self.__update_questions, questions= questions)
         return result
-    def prepare_bulk_updates(self, ids_or_conditions, new_values):
-        # Placeholder implementation of bulk update preparation.
-        bulk_updates = []
-        for id_or_condition, new_value in zip(ids_or_conditions, new_values):
-            if isinstance(id_or_condition, dict):
-                condition = id_or_condition
-            else:
-                condition = {"_id": id_or_condition}
-            bulk_updates.append(
-                {
-                    "update_one": {
-                        "filter": condition,
-                        "update": {"$set": new_value},
-                        "upsert": False
-                    }
-                }
-            )
-        return bulk_updates
