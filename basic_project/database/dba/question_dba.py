@@ -101,7 +101,7 @@ class QuestionDBA(MongoDBA):
             return False
 
     def __update_many(
-        self, condition: Dict[str, Any], new_values: List[Any], session=None
+        self, condition: Dict[str, Any], new_values: Dict[Any], session=None
     ) -> bool:
         try:
             print(new_values)
@@ -201,7 +201,7 @@ class QuestionDBA(MongoDBA):
         )
         return result
 
-    def update_many(self, condition: Dict[str, Any], new_values: List[Any]) -> bool:
+    def update_many(self, condition: Dict[str, Any], new_values: Dict[Any]) -> bool:
         result = self.transaction(
             self.__update_many, condition=condition, new_values=new_values
         )
