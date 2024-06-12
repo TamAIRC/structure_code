@@ -104,9 +104,11 @@ class QuestionDBA(MongoDBA):
         self, condition: Dict[str, Any], new_values: List[Any], session=None
     ) -> bool:
         try:
+            print(new_values)
             result = self.collection.update_many(condition, {"$set": new_values}, session=session)
             return result.modified_count > 0
         except ValueError as err:
+            print(err)
             Logger("QuestionDBA").log_error(f"Error when update many: {err}")
             return False
 
@@ -125,12 +127,13 @@ class QuestionDBA(MongoDBA):
         self, ids: List[Any], new_values: List[Dict[str, Any]], session=None
     ) -> bool:
         try:
-            bulk_updates = self.prepare_bulk_updates(ids, new_values)
+            bulk_updates = MongoDBA.prepare_bulk_updates(ids, new_values)
             result = self.collection.bulk_write(bulk_updates, session=session)
             return result.modified_count > 0
         except ValueError as err:
             Logger("QuestionDBA").log_error(f"Error when update many by id: {err}")
             return False
+    
 
     def __delete_one(self, condition: Dict[str, Any], session=None) -> bool:
         try:
@@ -166,13 +169,14 @@ class QuestionDBA(MongoDBA):
             Logger("QuestionDBA").log_error(f"Error when delete many by id: {err}")
             return False
 
+
     # Public function
     def find_one(self, condition: Dict[str, Any]) -> Question:
         result = self.transaction(self.__find_one, condition=condition)
         return result
 
     def find_many(self, condition: Dict[str, Any], n: int = None) -> List[Question]:
-        result = self.transaction(self.__find_many, condition=condition)
+        result = self.transaction(self.__find_many, condition=condition, n=n)
         return result
 
     def find_by_id(self, id) -> Question:
@@ -208,6 +212,8 @@ class QuestionDBA(MongoDBA):
         return result
 
     def update_by_ids(self, ids: List[Any], new_values: List[Dict[str, Any]]) -> bool:
+        print("ids:", ids)
+        print("values:", new_values)
         result = self.transaction(self.__update_by_ids, ids=ids, new_values=new_values)
         return result
 
@@ -228,23 +234,8 @@ class QuestionDBA(MongoDBA):
         return result
 
     def update_questions(self, questions: List[Question]):
-        result = self.transaction(self.__update_questions, questions= questions)
+        ids = [question.get_id() for question in questions]
+        new_values = [question.to_json() for question in questions]
+        result = self.transaction(self.__update_by_ids, ids= ids, new_values= new_values)
         return result
-    def prepare_bulk_updates(self, ids_or_conditions, new_values):
-        # Placeholder implementation of bulk update preparation.
-        bulk_updates = []
-        for id_or_condition, new_value in zip(ids_or_conditions, new_values):
-            if isinstance(id_or_condition, dict):
-                condition = id_or_condition
-            else:
-                condition = {"_id": id_or_condition}
-            bulk_updates.append(
-                {
-                    "update_one": {
-                        "filter": condition,
-                        "update": {"$set": new_value},
-                        "upsert": False
-                    }
-                }
-            )
-        return bulk_updates
+    

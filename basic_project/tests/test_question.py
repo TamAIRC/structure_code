@@ -79,46 +79,52 @@ def test_QuestionDBA():
 
     # print("=====================")
 
-    id_test = ""
+    id_test = ObjectId("66260e94a51b34b732f211ee")
 
     # Test insert
-    id_test = question_dba.insert_one(obj=sample_question)
-    print("insert", id_test)
+    # id_test = question_dba.insert_one(obj=sample_question)
+    # print("insert", id_test)
 
-    print("=====================")
+    # print("=====================")
 
-    # Test find_by_id
-    result = question_dba.find_by_id(
-        ObjectId(id_test)
-    )
-    print("find_by_id")
-    print(result)
-    print("=====================")
+    # # Test find_by_id
+    # result = question_dba.find_by_id(
+    #     ObjectId(id_test)
+    # )
+    # print("find_by_id")
+    # print(result)
+    # print("=====================")
 
-    # Test insert_many
-    result = question_dba.insert_many(objs=[sample_question])
-    print("insert_many")
-    print(result)
-    print("=====================")
+    # # Test insert_many
+    # result = question_dba.insert_many(objs=[sample_question])
+    # print("insert_many")
+    # print(result)
+    # print("=====================")
 
-    # Test update_one_by_id
-    result = question_dba.update_by_id(
-        id=id_test,
-        new_value={"content": "Updated Question"},
-    )
-    print("update_one_by_id")
-    print(result)
-    print("=====================")
+    # # Test update_one_by_id
+    # result = question_dba.update_by_id(
+    #     id=id_test,
+    #     new_value={"content": "Updated Question"},
+    # )
+    # print("update_one_by_id")
+    # print(result)
+    # print("=====================")
 
     # Test update_many_by_id
-    result = question_dba.update_by_ids(
-        ids=[id_test],
-        new_values=[{"content": "Updated Question"}],
+    # result = question_dba.update_by_ids(
+    #     ids=[id_test],
+    #     new_values=[{"content": "Updated Question"}],
+    # )
+    # print("update_many_by_id")
+    # print(result)
+    # print("=====================")
+    result = question_dba.update_many(
+        {"_id": id_test},
+        new_values={"content": "Updated Question"}
     )
-    print("update_many_by_id")
+    print("update_many")
     print(result)
     print("=====================")
-
     # Test find_one
     print("find_one")
     result = question_dba.find_one(
@@ -130,15 +136,15 @@ def test_QuestionDBA():
     # Test find_many
     print("find_many")
     result = question_dba.find_many(
-        n=1, condition={"category": "Geography"}
+        condition={"category": "Geography"}, n=1
     )
     print(result)
     print("=====================")
 
     # # Test delete_by_id
-    print("delete_by_id")
-    result = question_dba.delete_by_id(id=id_test)
-    print(result)
+    # print("delete_by_id")
+    # result = question_dba.delete_by_id(id=id_test)
+    # print(result)
     
     # Delete questions
     # delete_data = ["66260e94a51b34b732f211df", "66260e94a51b34b732f211e0"]
