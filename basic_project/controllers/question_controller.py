@@ -32,18 +32,18 @@ class QuestionController:
             print("Exception in get_questions:", e)
             return successed, None
 
-    # async def insert_questions(self, questions: List[dict]) -> bool:
-    #     try:
-    #         for question in questions:
-    #             question['multimedia'] = normalize_id(question["multimedia"])
-    #         questions = [QuestionDBO(**question) for question in questions]
-    #         self.dba.transaction(self.dba.insert_many, objs= questions)
-    #         successed = True
-    #         return successed
-    #     except Exception as e:
-    #         print("Exception in insert_questions in controllers:", e)
-    #         successed = False
-    #         return successed
+    async def insert_questions(self, questions: List[dict]) -> bool:
+        try:
+            for question in questions:
+                question['multimedia'] = normalize_id(question["multimedia"])
+            questions = [QuestionDBO(**question) for question in questions]
+            self.dba.insert_many(questions)
+            successed = True
+            return successed
+        except Exception as e:
+            print("Exception in insert_questions in controllers:", e)
+            successed = False
+            return successed
     async def update_questions(self, in_questions: List[dict]) -> bool:
         try:
             in_questions = [QuestionDBO.from_json_obj(question) for question in in_questions]
@@ -67,14 +67,14 @@ class QuestionController:
             successed = False
             return successed
     
-    # async def delete_questions(self, ids: List[str], session_id: str) -> bool:
-    #     try:
-    #         ids = [normalize_id(id) for id in ids]
-    #         self.dba.transaction(self.dba.delete_questions, ids=ids)
-    #         successed = True    
-    #         return successed
-    #     except Exception as e:
-    #         print("Exception in delete_questions:", e)
-    #         successed = False
-    #         return successed
+    async def delete_questions(self, ids: List[str], session_id: str) -> bool:
+        try:
+            ids = [normalize_id(id) for id in ids]
+            self.dba.transaction(self.dba.delete_questions, ids=ids)
+            successed = True    
+            return successed
+        except Exception as e:
+            print("Exception in delete_questions:", e)
+            successed = False
+            return successed
         
