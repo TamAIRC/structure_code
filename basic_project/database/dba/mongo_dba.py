@@ -90,7 +90,7 @@ class MongoDBA(BaseDBA):
         pass
 
     @abstractmethod
-    def update_many(self, condition: Dict[str, Any], new_values: List[Any]) -> bool:
+    def update_many(self, condition: Dict[str, Any], new_values: Dict[str, Any]) -> bool:
         pass
 
     @abstractmethod

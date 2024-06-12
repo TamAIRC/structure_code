@@ -101,7 +101,7 @@ class QuestionDBA(MongoDBA):
             return False
 
     def __update_many(
-        self, condition: Dict[str, Any], new_values: List[Any], session=None
+        self, condition: Dict[str, Any], new_values: Dict[str, Any], session=None
     ) -> bool:
         try:
             result = self.collection.update_many(condition, {"$set": new_values}, session=session)
