@@ -1,11 +1,9 @@
 import os
 import sys
 from bson import ObjectId
-from pydantic import BaseModel, ConfigDict, Field
-from typing import Any, Dict, List
-from datetime import datetime as Date
+from pydantic import ConfigDict, Field
+from typing import Any, Dict, List, Union
 
-# Assuming current_dir, project_root, and sys.path setup are correct
 
 current_dir = os.path.dirname(__file__)
 project_root = os.path.abspath(os.path.join(current_dir, "../../"))
@@ -14,15 +12,9 @@ sys.path.append(project_root)
 from patterns.base_dbo import BaseDBO
 from utils import util
 
-class Question(BaseModel):
-    question_id: ObjectId = Field(default_factory=ObjectId, alias="_id")
-    outcome: int
-    timestamp: Date
-    timeForAnswer: int
-
 class ResultDBO(BaseDBO):
     player_id: ObjectId = Field(default_factory=ObjectId, alias="_id")
-    questions: List[Question]
+    questions: List[Any]
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
@@ -39,18 +31,17 @@ class ResultDBO(BaseDBO):
     @classmethod
     def from_array(cls, array: List[Any]):
         """Convert array to data format."""
-        player_id = ObjectId(array[0])
-        questions = [
-            Question(
-                question_id=ObjectId(question[0]),
-                outcome=question[1],
-                timestamp=Date.fromisoformat(question[2]),
-                timeForAnswer=question[3]
-            ) for question in array[1]
-        ]
-        return cls(player_id=player_id, questions=questions)
+        return cls(
+            id=array[0],
+            category=array[1],
+            subcategory=array[2],
+            content=array[3],
+            answers=array[4],
+            correct_answer=array[5],
+            multimedia=array[6],
+        )
 
-    def copy_a_to_b(self, a: "ResultDBO", b: "ResultDBO"):
+    def copy_a_to_b(self, a: "QuestionDBO", b: "QuestionDBO"):
         """Copy attributes from a to b, with some modifications."""
         for attr, value in a.model_dump().items():
             if hasattr(b, attr):
@@ -66,3 +57,22 @@ class ResultDBO(BaseDBO):
         """Convert the Question object to a string representation."""
         return str(self.model_dump(by_alias=True))
 
+
+if __name__ == "__main__":
+    # Example data
+    example_data = {
+        "_id": ObjectId("66260e86a51b34b732f21182"),
+        "category": "Geography",
+        "subcategory": "Medieval History",
+        "content": "Phone rule we pattern be clear.",
+        "answers": ["answer1", "answer2", "answer3", "answer4"],
+        "correct_answer": "nature",
+        "difficulty": 5,
+        "required_rank": 5,
+        "language": 2,
+        "multimedia": ObjectId("66260e86a51b34b732f21182"),
+    }
+
+    # Create an instance of the Document model
+    document_instance = QuestionDBO(**example_data)
+    print(document_instance)
