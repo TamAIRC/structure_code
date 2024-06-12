@@ -9,7 +9,6 @@ pymongo >= 4.6
 
 pytz >= 2024.1
 pydantic >= 2.7.2
-fastapi
 
 # Test APP: https://semaphoreci.com/community/tutorials/testing-python-applications-with-pytest
 pytest

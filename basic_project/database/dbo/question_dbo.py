@@ -56,10 +56,6 @@ class QuestionDBO(BaseDBO):
     @classmethod
     def from_json_obj(cls, json_obj: Dict[str, Any]):
         """Convert JSON object to data format."""
-        if json_obj['_id']:
-            json_obj["_id"] = ObjectId(json_obj["_id"])
-        if json_obj['multimedia']:
-            json_obj["multimedia"] = ObjectId(json_obj["multimedia"])
         return cls(**json_obj)
 
     @classmethod
@@ -82,9 +78,7 @@ class QuestionDBO(BaseDBO):
                 setattr(b, attr, value)
 
     def to_json(self) -> Dict[str, Any]:
-        data = self.dict(by_alias=True)
-        data["_id"] = str(data["_id"]) if data["_id"] else None
-        data["multimedia"] = str(data["multimedia"]) if data["multimedia"] else None
+        data = self.model_dump_json(by_alias=True)
         return data
 
     def to_string(self) -> str:
