@@ -21,7 +21,6 @@ from pymongo.errors import ServerSelectionTimeoutError, ConnectionFailure, PyMon
 
 class MongoDBA(BaseDBA):
     def __init__(self, collection_name):
-        super.__init__()
         self.collection_name = collection_name
         self.collection = None
 
@@ -65,7 +64,7 @@ class MongoDBA(BaseDBA):
         pass
 
     @abstractmethod
-    def find_many(self, condition: List[Any], n: int = None) -> List[Any]:
+    def find_many(self, condition: Dict[str, Any], n: int = None) -> List[Any]:
         """
         Find multiple documents in a collection that match the specified condition.
 
@@ -91,7 +90,7 @@ class MongoDBA(BaseDBA):
         pass
 
     @abstractmethod
-    def update_many(self, condition: List[Any], new_values: List[Any]) -> bool:
+    def update_many(self, condition: Dict[str, Any], new_values: Dict[str, Any]) -> bool:
         pass
 
     @abstractmethod
@@ -99,9 +98,10 @@ class MongoDBA(BaseDBA):
         pass
 
     @abstractmethod
-    def delete_many(self, condition: List[Any]) -> bool:
+    def delete_many(self, condition: Dict[str, Any]) -> bool:
         pass
 
+    @staticmethod
     def prepare_bulk_updates(ids: List[ObjectId], new_values: List[Dict[str, Any]]):
         """
         #     Prepare a list of bulk update operations.
@@ -128,6 +128,7 @@ class MongoDBA(BaseDBA):
                 raise ValueError(f"Error processing ID {id}: {e}") from e
         return bulk_updates
 
+    @staticmethod
     def prepare_bulk_deletes(ids):
         """
         Prepare a list of bulk delete operations.
