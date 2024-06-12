@@ -12,17 +12,14 @@ sys.path.append(project_root)
 from patterns.base_dbo import BaseDBO
 
 
-class QuestionDBO(BaseDBO):
+class PlayerDBO(BaseDBO):
     id: Optional[ObjectId] = Field(default=None, alias="_id")
-    category: Union[int, str]
-    subcategory: str
-    content: str
-    answers: List[str]
-    correct_answer: str
-    difficulty: int
-    required_rank: int
-    language: int
-    multimedia: Optional[ObjectId] = Field(default=None)
+    major: Union[int, str]
+    birth_year: int
+    full_name: str
+    email: str
+    degree: int
+    rank: int
 
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
@@ -31,14 +28,14 @@ class QuestionDBO(BaseDBO):
     )
 
     # Chuyển đổi thành ObjectId nếu đầu vào là string trước khi validate
-    @field_validator("id", "multimedia", mode="before")
+    @field_validator("id", mode="before")
     def convert_to_object_id(cls, value):
         if isinstance(value, str):
             return ObjectId(value)
         return value
 
     # Chuyển đổi thành ObjectId nếu đầu vào là string trước khi validate
-    @field_validator("id", "multimedia", mode="before")
+    @field_validator("id", mode="before")
     def convert_to_object_id(cls, value):
         if isinstance(value, str):
             return ObjectId(value)
@@ -58,8 +55,6 @@ class QuestionDBO(BaseDBO):
         """Convert JSON object to data format."""
         if json_obj['_id']:
             json_obj["_id"] = ObjectId(json_obj["_id"])
-        if json_obj['multimedia']:
-            json_obj["multimedia"] = ObjectId(json_obj["multimedia"])
         return cls(**json_obj)
 
     @classmethod
@@ -75,7 +70,7 @@ class QuestionDBO(BaseDBO):
             multimedia=array[6],
         )
 
-    def copy_a_to_b(self, a: "QuestionDBO", b: "QuestionDBO"):
+    def copy_a_to_b(self, a: "PlayerDBO", b: "PlayerDBO"):
         """Copy attributes from a to b, with some modifications."""
         for attr, value in a.model_dump().items():
             if hasattr(b, attr):
@@ -84,13 +79,9 @@ class QuestionDBO(BaseDBO):
     def to_json(self) -> Dict[str, Any]:
         data = self.dict(by_alias=True)
         data["_id"] = str(data["_id"]) if data["_id"] else None
-        data["multimedia"] = str(data["multimedia"]) if data["multimedia"] else None
         return data
 
     def to_string(self) -> str:
         """Convert the Question object to a string representation."""
         return str(self.model_dump(by_alias=True))
 
-    def validate_multimedia(id):
-        # TODO: Ensure the multimedia ID exists in the database.
-        return True
