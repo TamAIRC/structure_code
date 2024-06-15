@@ -1,14 +1,16 @@
 import os
 import sys
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from typing import Any, Dict, List
 from bson import ObjectId
+from pymongo import UpdateOne, DeleteOne
 
 
 current_dir = os.path.dirname(__file__)
 project_root = os.path.abspath(os.path.join(current_dir, "../../"))
 sys.path.append(project_root)
 
+from utils.util import normalize_id
 from configs.db_config import CONNECT
 from logger.logger import Logger
 from patterns.base_dba import BaseDBA
@@ -41,7 +43,7 @@ class MongoDBA(BaseDBA):
                 ServerSelectionTimeoutError,
                 PyMongoError,
             ) as err:
-                Logger("MongoDBA").log_error("Transaction failed", err)
+                Logger("MongoDBA").log_error(f"Transaction failed: {err}")
                 session.abort_transaction()
                 Logger("MongoDBA").log_info("Transaction aborted")
                 result = None
@@ -49,31 +51,100 @@ class MongoDBA(BaseDBA):
         return result
 
     @abstractmethod
-    def find_by_id(self, id) -> Any:
-        pass
-
-    @abstractmethod
     def find_one(self, condition: Dict[str, Any]) -> Any:
+        """
+        Find a single document in a collection that matches the specified condition.
+
+        Parameters:
+            condition (Dict[str, Any]): The condition to match the document.
+
+        Returns:
+            Any: The matched document, or None if no document matches the condition.
+        """
         pass
 
     @abstractmethod
-    def find_many(self, n: int, condition: Dict[str, Any]) -> List[Any]:
+    def find_many(self, condition: Dict[str, Any], n: int = None) -> List[Any]:
+        """
+        Find multiple documents in a collection that match the specified condition.
+
+        Parameters:
+            condition (List[Any]): The condition to match the documents.
+            n (int, optional): The maximum number of documents to return. If None, returns all matched documents.
+
+        Returns:
+            List[Any]: A list of matched documents.
+        """
         pass
 
     @abstractmethod
-    def update_one_by_id(self, id: ObjectId, new_value: Dict[str, Any]) -> bool:
+    def insert_one(self, obj: Any):
         pass
 
     @abstractmethod
-    def update_many_by_id(
-        self, ids: List[ObjectId], new_values: List[Dict[str, Any]]
-    ) -> bool:
+    def insert_many(self, obj: Any):
         pass
 
     @abstractmethod
-    def insert(self, obj: Any) -> ObjectId:
+    def update_one(self, condition: Dict[str, Any], new_value: List[Any]) -> bool:
         pass
 
     @abstractmethod
-    def delete_by_id(self, id: ObjectId) -> bool:
+    def update_many(self, condition: Dict[str, Any], new_values: Dict[str, Any]) -> bool:
         pass
+
+    @abstractmethod
+    def delete_one(self, condition: Dict[str, Any]) -> bool:
+        pass
+
+    @abstractmethod
+    def delete_many(self, condition: Dict[str, Any]) -> bool:
+        pass
+
+    @staticmethod
+    def prepare_bulk_updates(ids: List[ObjectId], new_values: List[Dict[str, Any]]):
+        """
+        #     Prepare a list of bulk update operations.
+
+        #     Parameters:
+        #     - ids: list of str or ObjectId
+        #     - new_values: list of dict
+
+        #     Returns:
+        #     - list of dict
+        #"""
+        if len(ids) != len(new_values):
+            raise ValueError("The length of ids and new_values must match")
+        bulk_updates = []
+        for _id, values in zip(ids, new_values):
+            try:
+                normalized_id = normalize_id(_id)
+                # Ensure _id is not included in the update part
+                update_values = {k: v for k, v in values.items() if k != "_id"}
+                bulk_updates.append(
+                    UpdateOne({"_id": normalized_id}, {"$set": update_values})
+                )
+            except ValueError as e:
+                raise ValueError(f"Error processing ID {id}: {e}") from e
+        return bulk_updates
+
+    @staticmethod
+    def prepare_bulk_deletes(ids):
+        """
+        Prepare a list of bulk delete operations.
+
+        Parameters:
+        - ids: list of str or ObjectId
+
+        Returns:
+        - list of DeleteOne operations
+        """
+        bulk_deletes = []
+        for id in ids:
+            try:
+                normalized_id = normalize_id(id)
+                bulk_deletes.append(DeleteOne({"_id": normalized_id}))
+            except ValueError as e:
+                raise ValueError(f"Error processing ID {id}: {e}") from e
+
+        return bulk_deletes
