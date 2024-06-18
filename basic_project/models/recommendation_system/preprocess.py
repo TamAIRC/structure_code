@@ -18,21 +18,32 @@ from recommendation_system.helper import (
 )
 
 class Preprocess(BasePreprocessing): 
-    def __init__(self,
-                 question_id_to_ix: dict[ObjectId, int],
-                 ix_to_question_id: dict[int, ObjectId],
-                 player_id_to_ix: dict[ObjectId, int],
-                 ix_to_player_id: dict[int, ObjectId],
-                 observation_players: np.ndarray,
-                 observation_questions: np.ndarray,
-                 observations: np.ndarray):
-        self.question_id_to_ix = question_id_to_ix
-        self.ix_to_question_id = ix_to_question_id
-        self.player_id_to_ix = player_id_to_ix
-        self.ix_to_player_id = ix_to_player_id
-        self.observation_players = observation_players
-        self.observation_questions = observation_questions
-        self.observations = observations
+    # def __init__(self,
+    #              question_id_to_ix: dict[ObjectId, int],
+    #              ix_to_question_id: dict[int, ObjectId],
+    #              player_id_to_ix: dict[ObjectId, int],
+    #              ix_to_player_id: dict[int, ObjectId],
+    #              observation_players: np.ndarray,
+    #              observation_questions: np.ndarray,
+    #              observations: np.ndarray):
+    #     self.question_id_to_ix = question_id_to_ix
+    #     self.ix_to_question_id = ix_to_question_id
+    #     self.player_id_to_ix = player_id_to_ix
+    #     self.ix_to_player_id = ix_to_player_id
+    #     self.observation_players = observation_players
+    #     self.observation_questions = observation_questions
+    #     self.observations = observations
+    #     self.sparse_matrix = None
+    
+    def __init__(self):
+        self.question_id_to_ix = None
+        self.ix_to_question_id = None
+        self.player_id_to_ix = None
+        self.ix_to_player_id = None
+        self.observation_players = None
+        self.observation_questions = None
+        self.observations = None
+        self.sparse_matrix = None
 
     def n_users(self):
         return len(self.player_id_to_ix)
@@ -86,17 +97,17 @@ class Preprocess(BasePreprocessing):
     def fit(self, player_data, question_data, interaction_data):
         merged_data, major_cols, category_cols = self.preprocess(player_data, question_data, interaction_data)
         rating = self.__calculate_rating(merged_data, major_cols, category_cols)
-        return Preprocess(question_id_to_ix=self.question_id_to_ix,
-                   ix_to_question_id=self.ix_to_question_id,
-                   player_id_to_ix=self.player_id_to_ix,
-                   ix_to_player_id=self.ix_to_player_id,
-                   observation_players=merged_data['player_id'].map(
-                       self.player_id_to_ix).to_list(),
-                   observation_questions=merged_data['question_id'].map(
-                       self.question_id_to_ix).to_list(),
-                   observations=rating.tolist())
+        self.observation_players=merged_data['player_id'].map(
+            self.player_id_to_ix).to_list(),
+        self.observation_questions=merged_data['question_id'].map(
+            self.question_id_to_ix).to_list(),
+        self.observations=rating.tolist()
+        self.sparse_matrix=self.__build_sparse_matrix()
+        
+    def get_sparse_matrix(self):
+        return self.sparse_matrix
 
-    def build_sparse_matrix(self):
+    def __build_sparse_matrix(self):
         return sparse.csr_matrix(
             (
                 self.observations,
