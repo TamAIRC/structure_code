@@ -14,7 +14,7 @@ class BaseAlgorithm(ABC):
         pass
     
     @abstractmethod
-    def fit_partial(self, new_data):
+    def update(self, new_data):
         pass
 
     @abstractmethod
@@ -25,6 +25,7 @@ class BaseAlgorithm(ABC):
     def save(self, path):
         pass
     
+    @staticmethod
     @abstractmethod
-    def load(self, path):
+    def load(path):
         pass
