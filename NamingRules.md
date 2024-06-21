@@ -1,122 +1,215 @@
-# Quy Tắc Đặt Tên Trong Dự Án
+# Quy Tắc viết trong dự án
 
 ## Table of Contents
 
-- [Quy Tắc Đặt Tên Trong Dự Án](#quy-tắc-đặt-tên-trong-dự-án)
+- [Quy Tắc viết trong dự án](#quy-tắc-viết-trong-dự-án)
   - [Table of Contents](#table-of-contents)
-  - [1. Quy Tắc Đặt Tên File](#1-quy-tắc-đặt-tên-file)
-  - [2. Quy Tắc Đặt Tên Class](#2-quy-tắc-đặt-tên-class)
-  - [3. Quy Tắc Đặt Tên Function](#3-quy-tắc-đặt-tên-function)
-  - [4. Quy Tắc Đặt Tên Biến](#4-quy-tắc-đặt-tên-biến)
-  - [5. Quy Tắc Đặt Tên Constants](#5-quy-tắc-đặt-tên-constants)
-  - [6. Quy Tắc Đặt Tên Package và Module](#6-quy-tắc-đặt-tên-package-và-module)
-  - [7. Ví dụ](#7-ví-dụ)
-  - [Tóm Tắt](#tóm-tắt)
+  - [1. Quy định chung](#1-quy-định-chung)
+    - [1.1. Đặt tên Biến, Hàm, và Class:](#11-đặt-tên-biến-hàm-và-class)
+    - [1.2. Viết mô tả (Docstrings):](#12-viết-mô-tả-docstrings)
+  - [2. Quy tắc viết Code OOP](#2-quy-tắc-viết-code-oop)
+    - [2.1. `Encapsulation (Đóng Gói)`:](#21-encapsulation-đóng-gói)
+    - [2.2. `Inheritance (Kế Thừa)`:](#22-inheritance-kế-thừa)
+    - [2.3. `Polymorphism (Đa Hình)`:](#23-polymorphism-đa-hình)
+    - [2.4. `Abstraction (Trừu Tượng)`:](#24-abstraction-trừu-tượng)
+  - [3. Quy Tắc Viết Code Khác](#3-quy-tắc-viết-code-khác)
+  - [4. Quản Lý Dependencies và Environment](#4-quản-lý-dependencies-và-environment)
+    - [Sử Dụng `Virtual Environment`:](#sử-dụng-virtual-environment)
+    - [Quản Lý `Dependencies` Bằng `requirements.txt`:](#quản-lý-dependencies-bằng-requirementstxt)
+    - [Sử Dụng `setup.py` cho các dự án lớn:](#sử-dụng-setuppy-cho-các-dự-án-lớn)
 
-## 1. Quy Tắc Đặt Tên File
+## 1. Quy định chung
 
-- Tất cả chữ thường, sử dụng dấu gạch dưới để phân cách các từ.
-- Không nên sử dụng ký tự đặc biệt hoặc khoảng trắng trong tên file.
+### 1.1. Đặt tên Biến, Hàm, và Class:
 
-```
-app_config.py
-db_config.py
-user_model.py
-```
+Biến: `snake_case` (vd: `` my_variable`)
+Hàm: `snake_case` (vd:  ``my_function`)
+Class: `PascalCase`(vd:`MyClass`)
+Hằng Số: `UPPER_SNAKE_CASE`(vd:`MY_CONSTANT`)
 
-## 2. Quy Tắc Đặt Tên Class
+### 1.2. Viết mô tả (Docstrings):
 
-- Sử dụng PascalCase (hoặc CamelCase), mỗi từ bắt đầu bằng chữ in hoa, không dùng dấu gạch dưới.
-
-```py
-class UserProfile:
-class DatabaseAccess:
-class ProductModel:
-```
-
-## 3. Quy Tắc Đặt Tên Function
-
-- Sử dụng chữ thường và dấu gạch dưới để phân cách các từ.
-- Tên hàm nên mô tả chính xác chức năng của hàm.
+- Sử dụng docstring để mô tả các class, method, và function.
+- Docstring nên bao gồm mô tả chức năng, các tham số, và giá trị trả về.
 
 ```py
-def get_user_info():
-def calculate_total_price():
-def connect_to_database():
-```
+class MyClass:
+    """
+    Mô tả class MyClass.
 
-## 4. Quy Tắc Đặt Tên Biến
+    Attributes:
+        attr1 (type): Mô tả attr1.
+        attr2 (type): Mô tả attr2.
+    """
 
-- Sử dụng chữ thường và dấu gạch dưới để phân cách các từ.
-- Tên biến phải rõ ràng và có ý nghĩa, mô tả chính xác dữ liệu mà biến lưu trữ.
+    def __init__(self, attr1, attr2):
+        """
+        Khởi tạo MyClass.
 
-```py
-user_name = "John Doe"
-total_price = 100.50
-database_connection = None
-```
+        Args:
+            attr1 (type): Mô tả attr1.
+            attr2 (type): Mô tả attr2.
+        """
+        self.attr1 = attr1
+        self.attr2 = attr2
 
-## 5. Quy Tắc Đặt Tên Constants
+    def my_method(self, param1):
+        """
+        Mô tả method.
 
-- Sử dụng chữ in hoa và dấu gạch dưới để phân cách các từ.
+        Args:
+            param1 (type): Mô tả param1.
 
-```py
-MAX_CONNECTIONS = 100
-DATABASE_URL = "localhost:5432/mydb"
-TIMEOUT_DURATION = 30
-```
-
-## 6. Quy Tắc Đặt Tên Package và Module
-
-- Package: Sử dụng chữ thường, có thể sử dụng dấu gạch dưới để phân cách từ nếu cần.
-- Module: Tương tự như package, sử dụng chữ thường và dấu gạch dưới để phân cách từ.
-
-```
-package_name/
-module_name.py
-```
-
-## 7. Ví dụ
-
-```py
-# File: user_model.py
-
-class UserProfile:
-    def __init__(self, user_id, user_name):
-        self.user_id = user_id
-        self.user_name = user_name
-
-    def get_user_info(self):
-        return f"User ID: {self.user_id}, User Name: {self.user_name}"
-
-
-# File: db_config.py
-
-DATABASE_URL = "localhost:5432/mydb"
-MAX_CONNECTIONS = 100
-
-
-# File: database_access.py
-
-class DatabaseAccess:
-    def __init__(self, db_url):
-        self.db_url = db_url
-        self.connection = None
-
-    def connect_to_database(self):
-        # Code to connect to database
-        pass
-
-    def close_connection(self):
-        # Code to close database connection
+        Returns:
+            type: Mô tả giá trị trả về.
+        """
         pass
 ```
 
-## Tóm Tắt
+## 2. Quy tắc viết Code OOP
 
-- `File`: Chữ thường, gạch dưới.
-- `Class`: PascalCase.
-- `Function`: Chữ thường, gạch dưới.
-- `Variable`: Chữ thường, gạch dưới.
-- `Constants`: Chữ in hoa, gạch dưới.
-- `Package và Module`: Chữ thường, gạch dưới (nếu cần).
+### 2.1. `Encapsulation (Đóng Gói)`:
+
+- Sử dụng biến private (`__`) và protected (`_`) để kiểm soát truy cập.
+
+```py
+class MyClass:
+    def __init__(self, public_attr, protected_attr, private_attr):
+        self.public_attr = public_attr
+        self._protected_attr = protected_attr
+        self.__private_attr = private_attr
+```
+
+### 2.2. `Inheritance (Kế Thừa)`:
+
+- Sử dụng kế thừa để chia sẻ chức năng giữa các class có liên quan.
+
+```py
+class BaseClass:
+    def __init__(self, base_attr):
+        self.base_attr = base_attr
+
+    def base_method(self):
+        pass
+```
+
+```py
+class DerivedClass(BaseClass):
+    def __init__(self, base_attr, derived_attr):
+        super().__init__(base_attr)
+        self.derived_attr = derived_attr
+
+    def derived_method(self):
+        pass
+```
+
+### 2.3. `Polymorphism (Đa Hình)`:
+
+- Sử dụng đa hình để xử lý các đối tượng khác nhau thông qua cùng một interface.
+
+```py
+class Animal:
+    def speak(self):
+        pass
+
+class Dog(Animal):
+    def speak(self):
+        return "Woof!"
+
+class Cat(Animal):
+    def speak(self):
+        return "Meow!"
+```
+
+### 2.4. `Abstraction (Trừu Tượng)`:
+
+- Sử dụng abstract class và method để định nghĩa các phương thức trừu tượng cần được implement trong các lớp con.
+
+```py
+from abc import ABC, abstractmethod
+
+class AbstractClass(ABC):
+    @abstractmethod
+    def abstract_method(self):
+        pass
+```
+
+```py
+class ConcreteClass(AbstractClass):
+    def abstract_method(self):
+        pass
+```
+
+## 3. Quy Tắc Viết Code Khác
+
+- Tuân Thủ `PEP 8`:
+
+  - Sử dụng chuẩn [PEP 8 Style Guide](https://peps.python.org/pep-0008/) cho coding style
+
+- Sử dụng `Black Formatter`
+
+  - Sử dụng [Black Formatter](https://marketplace.visualstudio.com/items?itemName=ms-python.black-formatter) cho coding style
+
+- Sử dụng `Type Hints`:
+
+  - Sử dụng `type hints` để tăng cường tính rõ ràng và giúp kiểm tra lỗi.
+
+```py
+def my_function(param1: int, param2: str) -> bool:
+    return True
+```
+
+- Viết `Test Unit`:
+  - Mỗi class và method nên có unit test để kiểm tra tính đúng đắn.
+
+```py
+import unittest
+
+class TestMyClass(unittest.TestCase):
+    def test_my_method(self):
+        obj = MyClass(1, 2)
+        self.assertEqual(obj.my_method(), expected_value)
+```
+
+- Sử dụng `Logging` thay cho `Print`:
+  - Sử dụng module logging để ghi log thay vì dùng print.
+
+```py
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+logger.info("Thông tin log")
+```
+
+- Sử dụng `Context Manager`:
+  - Sử dụng `with` statement để quản lý tài nguyên như file, kết nối database.
+
+```py
+with open('file.txt', 'r') as file:
+    content = file.read()
+```
+
+## 4. Quản Lý Dependencies và Environment
+
+### Sử Dụng `Virtual Environment`:
+
+- Sử dụng `virtual environment` để quản lý `dependencies` cho mỗi dự án.
+
+```sh
+python -m venv env
+source env/bin/activate
+```
+
+### Quản Lý `Dependencies` Bằng `requirements.txt`:
+
+- Liệt kê tất cả các `dependencies` trong file `requirements.txt`.
+
+```sh
+pip freeze > requirements.txt
+```
+
+### Sử Dụng [`setup.py`](https://pythonhosted.org/an_example_pypi_project/setuptools.html) cho các dự án lớn:
+
+- Sử dụng [`setup.py`](setup.py.example) để tạo và quản lý các package.

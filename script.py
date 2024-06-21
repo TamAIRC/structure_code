@@ -7,10 +7,8 @@ import subprocess
 try:
     import requests
 except ModuleNotFoundError as e:
-    # print("Requests module not found:", e)
     subprocess.run(["pip", "install", "requests"])
     import requests
-
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -29,19 +27,12 @@ def download_file(url, folder, filename):
     Returns:
     - str: Full path of the downloaded file, or None if the file already exists.
     """
-
-    # Tạo đường dẫn đầy đủ của tệp
     filepath = os.path.join(folder, filename)
-
-    # Kiểm tra xem tệp đã tồn tại không
     if os.path.exists(filepath):
         print("Tệp đã tồn tại:", filepath)
         return filepath
-
-    # Tạo thư mục nếu nó chưa tồn tại
     if not os.path.exists(folder):
         os.makedirs(folder)
-
     try:
         response = requests.get(url)
         response.raise_for_status()
@@ -69,20 +60,16 @@ def download_and_extract_zip(url, extract_path="."):
         # Check if the destination folder exists, if not, create it
         if not os.path.exists(extract_path):
             os.makedirs(extract_path)
-
         # Get the filename from the URL
         filename = url.split("/")[-1]
 
-        # Check if the file already exists in the destination folder
         if os.path.exists(os.path.join(extract_path, filename)):
             print(f"{filename} already exists. Skipping download.")
             return True
-
         # Download the ZIP file
         logger.info(f"Downloading {filename}...")
         response = requests.get(url)
         response.raise_for_status()
-
         with zipfile.ZipFile(io.BytesIO(response.content), "r") as zip_ref:
             zip_ref.extractall(extract_path)
         logger.info(f"{filename} downloaded and extracted successfully.")
@@ -93,25 +80,18 @@ def download_and_extract_zip(url, extract_path="."):
 
 
 def install_packages():
-    """
-    Install required packages using pip.
-    """
-    packages = ["torch", "torchvision", "torchaudio"]
-    subprocess.run(
-        [
-            "pip",
-            "install",
-            *packages,
-            "--index-url",
-            "https://download.pytorch.org/whl/cu121",
-        ]
-    )
+    # packages = ["torch", "torchvision", "torchaudio"]
+    # subprocess.run(
+    #     [
+    #         "pip",
+    #         "install",
+    #         *packages,
+    #         "--index-url",
+    #         "https://download.pytorch.org/whl/cu121",
+    #     ]
+    # )
     subprocess.run(["python", "-m", "pip", "install", "-r", "requirements.txt"])
 
 
 def main():
     install_packages()
-
-
-if __name__ == "__main__":
-    main()
