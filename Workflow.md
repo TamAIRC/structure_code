@@ -273,6 +273,38 @@ Ví dụ: `git checkout -b ngotam/hotfix-api_get_question`
 
 - **2. Thực hiện hotfix, thử nghiệm nhanh và commit.**
 
+```sh
+git add .
+git commit -m "Sửa lỗi [mô tả lỗi]"
+```
+- **3. Đẩy nhánh sửa lỗi lên repository:**
+
+```sh
+git push origin hotfix/bug_[bug_name]
+```
+
+- **4. Tạo Pull Request (PR):**
+
+  - Tạo PR từ nhánh sửa lỗi đến nhánh deploy.
+  - Mô tả chi tiết về lỗi và cách khắc phục trong PR.
+
+- **5. Kiểm tra mã (Code Review):**
+  - Các thành viên khác xem xét và đưa ra phản hồi trên PR.
+  - Thảo luận và chỉnh sửa mã dựa trên phản hồi.
+
+- **6. Hợp nhất nhánh sửa lỗi vào nhánh chính:**
+
+  - Sau khi PR được chấp thuận, hợp nhất (merge) vào nhánh deploy.
+```sh
+git checkout deploy
+git merge hotfix/bug_[bug_name]
+```
+
+- **7. Triển khai bản sửa lỗi:**
+
+  - Thực hiện các bước triển khai bản sửa lỗi từ nhánh deploy lên môi trường production.
+  - Đảm bảo kiểm tra kỹ lưỡng để xác nhận rằng lỗi đã được sửa.
+
 ### Tóm Tắt Các Bước:
 
 - `Tạo Issue`: Mô tả tính năng hoặc vấn đề.
