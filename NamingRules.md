@@ -212,4 +212,4 @@ pip freeze > requirements.txt
 
 ### Sử Dụng [`setup.py`](https://pythonhosted.org/an_example_pypi_project/setuptools.html) cho các dự án lớn:
 
-- Sử dụng [`setup.py`](setup.py.example) để tạo và quản lý các package.
+- Sử dụng [`setup.py`](setup.example.py) để tạo và quản lý các package.
