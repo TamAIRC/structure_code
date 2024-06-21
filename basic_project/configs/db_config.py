@@ -40,6 +40,6 @@ CONNECT["mongo"][
 
 SCHEMA = {
     "QUESTIONS": "questions",
-    "USER": "user",
+    "PLAYERS": "players",
     "ANSWERED_QUESTIONS": "answered_questions",
 }
