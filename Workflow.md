@@ -260,12 +260,12 @@ Ví dụ: `git push origin ngotam/experiment-api_get_question`
 
 - **5. Kiểm tra mã (Code Review) và hợp nhất tương tự như nhánh tính năng.**
 
-### 6.3. Quy trình sửa lỗi khẩn cấp (`hotfix`):
+### 6.3. Quy trình sửa lỗi khẩn cấp (`hotfix`) `main`:
 
-- **1. Tạo nhánh sửa lỗi từ nhánh `deploy`:**
+- **1. Tạo nhánh sửa lỗi từ nhánh `main`:**
 
 ```sh
-git checkout deploy
+git checkout main
 git checkout -b [username]/hotfix-[bug_name]
 ```
 
@@ -275,7 +275,7 @@ Ví dụ: `git checkout -b ngotam/hotfix-api_get_question`
 
 ```sh
 git add .
-git commit -m "Sửa lỗi [mô tả lỗi]"
+git commit -m "fix: [mô tả lỗi]"
 ```
 - **3. Đẩy nhánh sửa lỗi lên repository:**
 
@@ -283,27 +283,19 @@ git commit -m "Sửa lỗi [mô tả lỗi]"
 git push origin hotfix/bug_[bug_name]
 ```
 
-- **4. Tạo Pull Request (PR):**
+- **4. Hợp nhất nhánh sửa lỗi vào nhánh chính:**
 
-  - Tạo PR từ nhánh sửa lỗi đến nhánh deploy.
-  - Mô tả chi tiết về lỗi và cách khắc phục trong PR.
-
-- **5. Kiểm tra mã (Code Review):**
-  - Các thành viên khác xem xét và đưa ra phản hồi trên PR.
-  - Thảo luận và chỉnh sửa mã dựa trên phản hồi.
-
-- **6. Hợp nhất nhánh sửa lỗi vào nhánh chính:**
-
-  - Sau khi PR được chấp thuận, hợp nhất (merge) vào nhánh deploy.
+  - Sau khi PR được chấp thuận, hợp nhất (merge) vào nhánh `main`.
 ```sh
-git checkout deploy
+git checkout main
 git merge hotfix/bug_[bug_name]
 ```
 
-- **7. Triển khai bản sửa lỗi:**
+- **5. Triển khai bản sửa lỗi:**
 
-  - Thực hiện các bước triển khai bản sửa lỗi từ nhánh deploy lên môi trường production.
+  - Thực hiện các bước triển khai bản sửa lỗi lên môi trường production.
   - Đảm bảo kiểm tra kỹ lưỡng để xác nhận rằng lỗi đã được sửa.
+  - Thực hiện cập nhật code chỉnh sửa vào `deploy`- Đảm bảo tính năng.
 
 ### Tóm Tắt Các Bước:
 
