@@ -9,11 +9,17 @@ from abc import ABC, abstractmethod
 from logger.logger import Logger
 from patterns.singleton_meta import SingletonABCMeta
 
+
 class BaseConnection(ABC, metaclass=SingletonABCMeta):
     def __init__(self, database_name, **kwargs):
         self.client = None
         self.database = None
         self.database_name = database_name
+        self._connect()
+
+    @abstractmethod
+    def _connect(self):
+        pass
 
     @abstractmethod
     def _test_connection(self):

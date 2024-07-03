@@ -9,7 +9,10 @@
 │   └── logging_config.py
 │
 ├── /database         # Thư mục chứa các script và model liên quan đến database
-│   ├── /database_connection # Thư mục chứa các lớp quản lý kết nối database
+│   ├── __init__.py
+│   │
+│   ├── /connection   # Thư mục chứa các lớp quản lý kết nối database cụ thể
+│   │   ├── __init__.py
 │   │   ├── mongo_connection.py
 │   │   └── sql_connection.py
 │   │

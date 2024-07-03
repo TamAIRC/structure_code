@@ -1,11 +1,11 @@
 # postgresql_connection.py
 import psycopg2
 from configs.db_config import CONNECT
-from basic_project.patterns.base_connection import Connect
+from patterns.base_connection import BaseConnection as Connection
 from logger.logger import Logger
 
 
-class PostgreSQLConnection(Connect):
+class PostgreSQLConnection(Connection):
     def __init__(self, database_name):
         super().__init__(database_name)
         self._connect()

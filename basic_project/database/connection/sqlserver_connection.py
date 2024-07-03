@@ -8,13 +8,13 @@ project_root = os.path.abspath(os.path.join(current_dir, "../../"))
 sys.path.append(project_root)
 
 from configs.db_config import CONNECT
-from basic_project.patterns.base_connection import Connect
+from patterns.base_connection import BaseConnection as Connection
 from logger.logger import Logger
 
 import pyodbc
 
 
-class SQLServerConnection(Connect):
+class SQLServerConnection(Connection):
     def __init__(self, database_name):
         super().__init__(database_name)
         self._connect()
