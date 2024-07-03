@@ -12,6 +12,8 @@ sys.path.append(project_root)
 
 from database.dbo.question_dbo import QuestionDBO
 from database.dba.question_dba import QuestionDBA
+from database.dba.result_dba import ResultDBA
+from database.dba.player_dba import PlayerDBA
 from utils import util
 
 from bson import ObjectId
@@ -67,94 +69,106 @@ def test_QuestionDBO():
 
 
 def test_QuestionDBA():
-    question_dba = QuestionDBA()
-    print("sample_question", sample_question)
-    print("=====================")
+    # question_dba = QuestionDBA()
+    # print("sample_question", sample_question)
+    # print("=====================")
 
-    # Test get_questions - 100
-    result1 = question_dba.transaction(question_dba.get_questions, n=10)
-    print("get_questions")
-    # Sử dụng to_json để đảm bảo ObjectId được tuần tự hóa đúng cách
-    new_values = [question.to_json() for question in result1]
-    print(new_values)
+    # # Test get_questions - 100
+    # result1 = question_dba.transaction(question_dba.get_questions, n=10)
+    # print("get_questions")
+    # # Sử dụng to_json để đảm bảo ObjectId được tuần tự hóa đúng cách
+    # new_values = [question.to_json() for question in result1]
+    # print(new_values)
 
-    print("=====================")
+    # print("=====================")
 
-    id_test = ObjectId("66260e94a51b34b732f211ee")
+    # id_test = ObjectId("66260e94a51b34b732f211ee")
 
-    # Test insert
-    id_test = question_dba.insert_one(obj=sample_question)
-    print("insert", id_test)
+    # # Test insert
+    # id_test = question_dba.insert_one(obj=sample_question)
+    # print("insert", id_test)
 
-    print("=====================")
+    # print("=====================")
 
-    # Test find_by_id
-    result = question_dba.find_by_id(
-        ObjectId(id_test)
-    )
-    print("find_by_id")
-    print(result)
-    print("=====================")
+    # # Test find_by_id
+    # result = question_dba.find_by_id(
+    #     ObjectId(id_test)
+    # )
+    # print("find_by_id")
+    # print(result)
+    # print("=====================")
 
-    # Test insert_many
-    result = question_dba.insert_many(objs=[sample_question])
-    print("insert_many")
-    print(result)
-    print("=====================")
+    # # Test insert_many
+    # result = question_dba.insert_many(objs=[sample_question])
+    # print("insert_many")
+    # print(result)
+    # print("=====================")
 
-    # Test update_one_by_id
-    result = question_dba.update_by_id(
-        id=id_test,
-        new_value={"content": "Updated Question"},
-    )
-    print("update_one_by_id")
-    print(result)
-    print("=====================")
+    # # Test update_one_by_id
+    # result = question_dba.update_by_id(
+    #     id=id_test,
+    #     new_value={"content": "Updated Question"},
+    # )
+    # print("update_one_by_id")
+    # print(result)
+    # print("=====================")
 
-    # Test update_many_by_id
-    result = question_dba.update_by_ids(
-        ids=[id_test],
-        new_values=[{"content": "Updated Question"}],
-    )
-    print("update_many_by_id")
-    print(result)
-    print("=====================")
-    result = question_dba.update_many(
-        {"_id": id_test},
-        new_values={"content": "Updated Question"}
-    )
-    print("update_many")
-    print(result)
-    print("=====================")
-    # Test find_one
-    print("find_one")
-    result = question_dba.find_one(
-        condition={"category": "Geography"}
-    )
-    print(result)
-    print("=====================")
+    # # Test update_many_by_id
+    # result = question_dba.update_by_ids(
+    #     ids=[id_test],
+    #     new_values=[{"content": "Updated Question"}],
+    # )
+    # print("update_many_by_id")
+    # print(result)
+    # print("=====================")
+    # result = question_dba.update_many(
+    #     {"_id": id_test},
+    #     new_values={"content": "Updated Question"}
+    # )
+    # print("update_many")
+    # print(result)
+    # print("=====================")
+    # # Test find_one
+    # print("find_one")
+    # result = question_dba.find_one(
+    #     condition={"category": "Geography"}
+    # )
+    # print(result)
+    # print("=====================")
 
-    # Test find_many
-    print("find_many")
-    result = question_dba.find_many(
-        condition={"category": "Geography"}, n=1
-    )
-    print(result)
-    print("=====================")
+    # # Test find_many
+    # print("find_many")
+    # result = question_dba.find_many(
+    #     condition={"category": "Geography"}, n=1
+    # )
+    # print(result)
+    # print("=====================")
 
-    # Test delete_by_id
-    print("delete_by_id")
-    result = question_dba.delete_by_id(id=id_test)
-    print(result)
+    # # Test delete_by_id
+    # print("delete_by_id")
+    # result = question_dba.delete_by_id(id=id_test)
+    # print(result)
     
-    # Delete questions
-    delete_data = ["66260e94a51b34b732f211df", "66260e94a51b34b732f211e0"]
-    delete_data_obj = [util.normalize_id(data) for data in delete_data]
-    print(delete_data_obj)
-    deleted_status = question_dba.transaction(
-        question_dba.delete_questions, ids=delete_data
-    )
-    print("Deleted status: ", deleted_status)
+    # # Delete questions
+    # delete_data = ["66260e94a51b34b732f211df", "66260e94a51b34b732f211e0"]
+    # delete_data_obj = [util.normalize_id(data) for data in delete_data]
+    # print(delete_data_obj)
+    # deleted_status = question_dba.transaction(
+    #     question_dba.delete_questions, ids=delete_data
+    # )
+    # print("Deleted status: ", deleted_status)
+    
+    # result_dba = ResultDBA()
+    # results = result_dba.get_all()
+    # for result in results:
+    #     print(result)
+
+        
+    ids = ["663884b5f6b183dfa7fae2d0", "663884b5f6b183dfa7fae2da"]
+    player_dba = PlayerDBA()
+    results = player_dba.find_by_ids(ids=ids)
+    for result in results:
+        print(result)
 
 
 if __name__ == "__main__":

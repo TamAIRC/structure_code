@@ -1,20 +1,19 @@
 import os
 import sys
 from bson import ObjectId
-from pydantic import ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 from typing import Any, Dict, List, Union, Optional
 
-
+# Ensure the current directory and project root are correctly set
 current_dir = os.path.dirname(__file__)
 project_root = os.path.abspath(os.path.join(current_dir, "../../"))
 sys.path.append(project_root)
 
 from patterns.base_dbo import BaseDBO
 
-
 class PlayerDBO(BaseDBO):
     id: Optional[ObjectId] = Field(default=None, alias="_id")
-    major: Union[int, str]
+    major: List[str]
     birth_year: int
     full_name: str
     email: str
@@ -27,14 +26,7 @@ class PlayerDBO(BaseDBO):
         json_encoders={ObjectId: str},
     )
 
-    # Chuyển đổi thành ObjectId nếu đầu vào là string trước khi validate
-    @field_validator("id", mode="before")
-    def convert_to_object_id(cls, value):
-        if isinstance(value, str):
-            return ObjectId(value)
-        return value
-
-    # Chuyển đổi thành ObjectId nếu đầu vào là string trước khi validate
+    # Convert to ObjectId if the input is a string before validation
     @field_validator("id", mode="before")
     def convert_to_object_id(cls, value):
         if isinstance(value, str):
@@ -53,7 +45,7 @@ class PlayerDBO(BaseDBO):
     @classmethod
     def from_json_obj(cls, json_obj: Dict[str, Any]):
         """Convert JSON object to data format."""
-        if json_obj['_id']:
+        if "_id" in json_obj and json_obj["_id"]:
             json_obj["_id"] = ObjectId(json_obj["_id"])
         return cls(**json_obj)
 
@@ -61,13 +53,13 @@ class PlayerDBO(BaseDBO):
     def from_array(cls, array: List[Any]):
         """Convert array to data format."""
         return cls(
-            id=array[0],
-            category=array[1],
-            subcategory=array[2],
-            content=array[3],
-            answers=array[4],
-            correct_answer=array[5],
-            multimedia=array[6],
+            id=ObjectId(array[0]) if array[0] else None,
+            major=array[1],
+            birth_year=array[2],
+            full_name=array[3],
+            email=array[4],
+            degree=array[5],
+            rank=array[6],
         )
 
     def copy_a_to_b(self, a: "PlayerDBO", b: "PlayerDBO"):
@@ -82,6 +74,5 @@ class PlayerDBO(BaseDBO):
         return data
 
     def to_string(self) -> str:
-        """Convert the Question object to a string representation."""
+        """Convert the Player object to a string representation."""
         return str(self.model_dump(by_alias=True))
-
