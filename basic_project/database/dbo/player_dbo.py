@@ -11,6 +11,7 @@ sys.path.append(project_root)
 
 from patterns.base_dbo import BaseDBO
 
+
 class PlayerDBO(BaseDBO):
     id: Optional[ObjectId] = Field(default=None, alias="_id")
     major: List[str]
@@ -69,7 +70,7 @@ class PlayerDBO(BaseDBO):
                 setattr(b, attr, value)
 
     def to_json(self) -> Dict[str, Any]:
-        data = self.dict(by_alias=True)
+        data = self.model_dump(by_alias=True)
         data["_id"] = str(data["_id"]) if data["_id"] else None
         return data
 

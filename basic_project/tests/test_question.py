@@ -148,7 +148,7 @@ def test_QuestionDBA():
     # print("delete_by_id")
     # result = question_dba.delete_by_id(id=id_test)
     # print(result)
-    
+
     # # Delete questions
     # delete_data = ["66260e94a51b34b732f211df", "66260e94a51b34b732f211e0"]
     # delete_data_obj = [util.normalize_id(data) for data in delete_data]
@@ -157,13 +157,12 @@ def test_QuestionDBA():
     #     question_dba.delete_questions, ids=delete_data
     # )
     # print("Deleted status: ", deleted_status)
-    
+
     # result_dba = ResultDBA()
     # results = result_dba.get_all()
     # for result in results:
     #     print(result)
 
-        
     ids = ["663884b5f6b183dfa7fae2d0", "663884b5f6b183dfa7fae2da"]
     player_dba = PlayerDBA()
     results = player_dba.find_by_ids(ids=ids)

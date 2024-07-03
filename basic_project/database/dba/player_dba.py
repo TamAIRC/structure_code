@@ -18,10 +18,11 @@ from pymongo.errors import PyMongoError
 from bson import ObjectId
 from typing import Any, Dict, List
 
+
 class PlayerDBA(MongoDBA):
     def __init__(self):
         super().__init__(db_config.SCHEMA["PLAYERS"])
-    
+
     def __find_one(self, condition: Dict[str, Any], session=None) -> Player:
         try:
             validated_condition = validate_condition(condition)
@@ -58,9 +59,7 @@ class PlayerDBA(MongoDBA):
     def __find_by_ids(self, ids: List[Any], session=None) -> List[Player]:
         try:
             normalized_ids = [normalize_id(id) for id in ids]
-            pipeline = [
-                {"$match": {"_id": {"$in": normalized_ids}}}
-            ]
+            pipeline = [{"$match": {"_id": {"$in": normalized_ids}}}]
             results = self.collection.aggregate(pipeline, session=session)
             questions = [Player(**result) for result in results]
             return questions
@@ -90,7 +89,9 @@ class PlayerDBA(MongoDBA):
         self, condition: Dict[str, Any], new_value: Dict[str, Any], session=None
     ) -> bool:
         try:
-            result = self.collection.update_one(condition, {"$set": new_value}, session=session)
+            result = self.collection.update_one(
+                condition, {"$set": new_value}, session=session
+            )
             return result.modified_count > 0
         except ValueError as err:
             Logger("PlayerDBA").log_error(f"Error when update one: {err}")
@@ -100,7 +101,9 @@ class PlayerDBA(MongoDBA):
         self, condition: Dict[str, Any], new_values: Dict[str, Any], session=None
     ) -> bool:
         try:
-            result = self.collection.update_many(condition, {"$set": new_values}, session=session)
+            result = self.collection.update_many(
+                condition, {"$set": new_values}, session=session
+            )
             return result.modified_count > 0
         except ValueError as err:
             print(err)
@@ -128,7 +131,6 @@ class PlayerDBA(MongoDBA):
         except ValueError as err:
             Logger("PlayerDBA").log_error(f"Error when update many by id: {err}")
             return False
-    
 
     def __delete_one(self, condition: Dict[str, Any], session=None) -> bool:
         try:
@@ -163,7 +165,6 @@ class PlayerDBA(MongoDBA):
         except ValueError as err:
             Logger("PlayerDBA").log_error(f"Error when delete many by id: {err}")
             return False
-    
 
     # Public function
     def find_one(self, condition: Dict[str, Any]) -> Player:
@@ -196,7 +197,9 @@ class PlayerDBA(MongoDBA):
         )
         return result
 
-    def update_many(self, condition: Dict[str, Any], new_values: Dict[str, Any]) -> bool:
+    def update_many(
+        self, condition: Dict[str, Any], new_values: Dict[str, Any]
+    ) -> bool:
         result = self.transaction(
             self.__update_many, condition=condition, new_values=new_values
         )

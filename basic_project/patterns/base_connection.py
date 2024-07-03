@@ -15,7 +15,6 @@ class BaseConnection(ABC, metaclass=SingletonABCMeta):
         self.client = None
         self.database = None
         self.database_name = database_name
-        self._connect()
 
     @abstractmethod
     def _connect(self):
