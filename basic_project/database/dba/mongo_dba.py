@@ -43,7 +43,7 @@ class MongoDBA(BaseDBA):
                 ServerSelectionTimeoutError,
                 PyMongoError,
             ) as err:
-                Logger("MongoDBA").log_error("Transaction failed", err)
+                Logger("MongoDBA").log_error(f"Transaction failed: {err}")
                 session.abort_transaction()
                 Logger("MongoDBA").log_info("Transaction aborted")
                 result = None

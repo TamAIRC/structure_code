@@ -11,7 +11,6 @@ except ModuleNotFoundError as e:
     subprocess.run(["pip", "install", "requests"])
     import requests
 
-
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -93,25 +92,18 @@ def download_and_extract_zip(url, extract_path="."):
 
 
 def install_packages():
-    """
-    Install required packages using pip.
-    """
-    packages = ["torch", "torchvision", "torchaudio"]
-    subprocess.run(
-        [
-            "pip",
-            "install",
-            *packages,
-            "--index-url",
-            "https://download.pytorch.org/whl/cu121",
-        ]
-    )
+    # packages = ["torch", "torchvision", "torchaudio"]
+    # subprocess.run(
+    #     [
+    #         "pip",
+    #         "install",
+    #         *packages,
+    #         "--index-url",
+    #         "https://download.pytorch.org/whl/cu121",
+    #     ]
+    # )
     subprocess.run(["python", "-m", "pip", "install", "-r", "requirements.txt"])
 
 
 def main():
     install_packages()
-
-
-if __name__ == "__main__":
-    main()
